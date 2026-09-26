@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f17">
+<title>Sistema de Registros</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0f17;color:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:90px}
+header{position:sticky;top:0;z-index:10;background:#0b0f17ee;backdrop-filter:blur(12px);padding:14px 16px 10px;border-bottom:1px solid #252c38}
+h1{font-size:22px;margin:0 0 10px}.search{display:flex;gap:8px}.search input{flex:1}.wrap{padding:16px;max-width:800px;margin:auto}
+input,textarea,select{width:100%;background:#151b26;color:#fff;border:1px solid #303949;border-radius:12px;padding:13px;font-size:16px;margin:6px 0 12px}
+textarea{min-height:100px;resize:vertical}label{font-size:13px;color:#aeb7c6;font-weight:700}
+button{border:0;border-radius:12px;padding:13px 16px;background:#1677ff;color:#fff;font-size:15px;font-weight:800;cursor:pointer}
+button.secondary{background:#242c39;color:#fff}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1;min-width:140px}
+.panel{background:#111722;border:1px solid #252e3d;border-radius:16px;padding:16px;margin:12px 0}.panel h2,.panel h3{margin-top:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:15px;border-radius:15px;background:#151c28;border:1px solid #293344}.stat b{display:block;font-size:25px;margin-top:5px}
+.card{background:#151c28;border:1px solid #2a3444;border-radius:14px;padding:14px;margin:10px 0}.row{display:flex;align-items:center;gap:12px}.grow{flex:1}
+.avatar,.thumb{width:64px;height:64px;border-radius:12px;object-fit:cover;background:#252e3c;display:flex;align-items:center;justify-content:center;font-size:25px;flex:none}.thumb{width:90px;height:70px}
+.muted{color:#9da8b8}.empty{padding:20px;text-align:center;color:#8995a6}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.full{grid-column:1/-1}
+.preview{display:flex;gap:8px;flex-wrap:wrap}.preview img{width:90px;height:90px;object-fit:cover;border-radius:10px}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#101620;border-top:1px solid #293243;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 5px calc(7px + env(safe-area-inset-bottom))}
+.bottom button{background:transparent;color:#9da8b8;padding:9px 2px;font-size:11px}.bottom button.active{color:#fff;background:#202938}
+.fab{position:fixed;right:16px;bottom:84px;z-index:19;border-radius:30px;padding:14px 18px;box-shadow:0 8px 24px #0008}
+.result{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #252d39}.result:last-child{border-bottom:0}
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px}
+@media(max-width:600px){.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><h1 id="pageTitle">Inicio</h1><div class="search"><input id="globalSearch" placeholder="Buscar nombre, cédula, placa, VIN..."><button id="searchBtn">🔎</button></div></header>
+<main id="app" class="wrap"></main>
+<button id="fab" class="fab">👤 + Persona</button>
+<nav class="bottom">
+<button data-page="inicio">🏠<br>Inicio</button>
+<button data-page="personas">👤<br>Personas</button>
+<button data-page="vehiculos">🚗<br>Vehículos</button>
+<button data-page="ubicaciones">📍<br>Lugares</button>
+<button data-page="relaciones">🔗<br>Relaciones</button>
+</nav>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const KEY="sistema_registros_v3";
+let db=JSON.parse(localStorage.getItem(KEY)||'{"people":[],"vehicles":[],"locations":[],"relations":[]}');
+const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const readFile=f=>new Promise(resolve=>{if(!f)return resolve("");const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>resolve("");r.readAsDataURL(f)});
+const person=id=>db.people.find(x=>x.id===id);
+const vehicle=id=>db.vehicles.find(x=>x.id===id);
+const location=id=>db.locations.find(x=>x.id===id);
+
+function setPageTitle(t){$("pageTitle").textContent=t}
+function nav(page){
+ document.querySelectorAll(".bottom button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+ if(page==="inicio")renderHome();
+ if(page==="personas")renderPeople();
+ if(page==="vehiculos")renderVehicles();
+ if(page==="ubicaciones")renderLocations();
+ if(page==="relaciones")renderRelations();
+}
+
+function renderHome(){
+ setPageTitle("Inicio");
+ $("app").innerHTML=`<div class="stats">
+ <div class="stat">👤 Personas<b>${db.people.length}</b></div>
+ <div class="stat">🚗 Vehículos<b>${db.vehicles.length}</b></div>
+ <div class="stat">📍 Lugares<b>${db.locations.length}</b></div>
+ <div class="stat">🔗 Relaciones<b>${db.relations.length}</b></div>
+ </div>
+ <div class="panel"><h2>Acciones rápidas</h2><div class="actions">
+ <button data-add="persona">👤 Agregar persona</button><button data-add="vehiculo">🚗 Agregar vehículo</button>
+ <button data-add="ubicacion">📍 Agregar lugar</button><button data-add="relacion">🔗 Agregar relación</button>
+ </div></div>
+ <div class="panel"><h3>Cómo usarlo</h3><p class="muted">Agrega personas, vehículos y lugares. Después puedes relacionar personas entre sí y buscarlas por nombre, identificación, teléfono, placa o VIN.</p></div>`;
+ bindAddButtons();
+}
+function renderPeople(){
+ setPageTitle("Personas");
+ $("app").innerHTML=`<div class="panel"><button id="addPersonBig" style="width:100%;font-size:17px">👤 + AGREGAR PERSONA</button></div>
+ <div class="panel">${db.people.length?db.people.map(p=>`<div class="card"><div class="row">
+ ${p.photo?`<img class="avatar" src="${p.photo}">`:`<div class="avatar">👤</div>`}<div class="grow"><b>${esc(p.name)}</b><div class="muted">${esc(p.idnum||"Sin identificación")}</div><div class="muted">${esc(p.phone||"")}</div></div>
+ </div><div class="actions" style="margin-top:10px"><button data-view-person="${p.id}">Ver ficha</button></div></div>`).join(""):`<div class="empty">No hay personas registradas.</div>`}</div>`;
+ $("addPersonBig").addEventListener("click",()=>showForm("persona"));
+ document.querySelectorAll("[data-view-person]").forEach(b=>b.addEventListener("click",()=>viewPerson(b.dataset.viewPerson)));
+}
+function renderVehicles(){
+ setPageTitle("Vehículos");
+ $("app").innerHTML=`<div class="panel"><button id="addVehicle" style="width:100%">🚗 + AGREGAR VEHÍCULO</button></div><div class="panel">${db.vehicles.length?db.vehicles.map(v=>`<div class="card"><div class="row">${v.photos?.[0]?`<img class="thumb" src="${v.photos[0]}">`:`<div class="thumb">🚗</div>`}<div class="grow"><b>${esc(v.make)} ${esc(v.model)}</b><div class="muted">Placa: ${esc(v.plate||"-")}</div></div></div><button data-view-vehicle="${v.id}" style="margin-top:10px">Ver ficha</button></div>`).join(""):`<div class="empty">No hay vehículos.</div>`}</div>`;
+ $("addVehicle").addEventListener("click",()=>showForm("vehiculo"));
+ document.querySelectorAll("[data-view-vehicle]").forEach(b=>b.addEventListener("click",()=>viewVehicle(b.dataset.viewVehicle)));
+}
+function renderLocations(){
+ setPageTitle("Lugares");
+ $("app").innerHTML=`<div class="panel"><button id="addLocation" style="width:100%">📍 + AGREGAR LUGAR</button></div><div class="panel">${db.locations.length?db.locations.map(l=>`<div class="card"><div class="row">${l.photo?`<img class="thumb" src="${l.photo}">`:`<div class="thumb">📍</div>`}<div class="grow"><b>${esc(l.name)}</b><div class="muted">${esc(l.address||"")}</div></div></div><button data-view-location="${l.id}" style="margin-top:10px">Ver ficha</button></div>`).join(""):`<div class="empty">No hay lugares.</div>`}</div>`;
+ $("addLocation").addEventListener("click",()=>showForm("ubicacion"));
+ document.querySelectorAll("[data-view-location]").forEach(b=>b.addEventListener("click",()=>viewLocation(b.dataset.viewLocation)));
+}
+function renderRelations(){
+ setPageTitle("Relaciones");
+ $("app").innerHTML=`<div class="panel"><div class="actions"><button id="addRelation">🔗 + AGREGAR RELACIÓN</button></div></div><div class="panel">${db.relations.length?db.relations.map(r=>`<div class="card"><b>${esc(person(r.a)?.name||"?")} ↔ ${esc(person(r.b)?.name||"?")}</b><div class="muted">${esc(r.type||"Relación")}</div></div>`).join(""):`<div class="empty">No hay relaciones.</div>`}</div>`;
+ $("addRelation").addEventListener("click",()=>showForm("relacion"));
+}
+function bindAddButtons(){document.querySelectorAll("[data-add]").forEach(b=>b.addEventListener("click",()=>showForm(b.dataset.add)))}
+
+function showForm(type){
+ setPageTitle(type==="persona"?"Nueva persona":type==="vehiculo"?"Nuevo vehículo":type==="ubicacion"?"Nuevo lugar":"Nueva relación");
+ let body="";
+ if(type==="persona") body=`<div class="formgrid">
+ <div class="full"><label>Nombre completo *</label><input id="f_name" autocomplete="name"></div>
+ <div><label>Identificación</label><input id="f_id"></div><div><label>Teléfono</label><input id="f_phone" type="tel"></div>
+ <div class="full"><label>Correo</label><input id="f_email" type="email"></div>
+ <div class="full"><label>Foto principal</label><input id="f_photo" type="file" accept="image/*" capture="environment"><div id="photoPreview" class="preview"></div></div>
+ <div class="full"><label>Notas</label><textarea id="f_notes"></textarea></div></div>`;
+ if(type==="vehiculo") body=`<div class="formgrid">
+ <div><label>Marca *</label><input id="f_make"></div><div><label>Modelo *</label><input id="f_model"></div><div><label>Año</label><input id="f_year" inputmode="numeric"></div>
+ <div><label>Placa</label><input id="f_plate"></div><div class="full"><label>VIN</label><input id="f_vin"></div>
+ <div class="full"><label>Propietario</label><select id="f_owner"><option value="">Sin asignar</option>${db.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div>
+ <div class="full"><label>Fotos del vehículo</label><input id="f_vehicle_photos" type="file" accept="image/*" multiple capture="environment"><div id="vehiclePreview" class="preview"></div></div>
+ <div class="full"><label>Notas</label><textarea id="f_vehicle_notes"></textarea></div></div>`;
+ if(type==="ubicacion") body=`<div class="formgrid"><div class="full"><label>Nombre *</label><input id="f_loc_name"></div><div class="full"><label>Dirección</label><input id="f_address"></div><div><label>Latitud</label><input id="f_lat" inputmode="decimal"></div><div><label>Longitud</label><input id="f_lng" inputmode="decimal"></div><div class="full"><label>Foto</label><input id="f_loc_photo" type="file" accept="image/*" capture="environment"><div id="locPreview" class="preview"></div></div><div class="full"><label>Notas</label><textarea id="f_loc_notes"></textarea></div></div>`;
+ if(type==="relacion") body=`<div class="formgrid"><div class="full"><label>Persona A *</label><select id="f_a">${db.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div><div class="full"><label>Persona B *</label><select id="f_b">${db.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div><div class="full"><label>Tipo de relación</label><input id="f_type" placeholder="Familiar, laboral, amistad..."></div><div class="full"><label>Notas</label><textarea id="f_relation_notes"></textarea></div></div>`;
+ $("app").innerHTML=`<div class="panel"><h2>${type==="persona"?"👤":type==="vehiculo"?"🚗":type==="ubicacion"?"📍":"🔗"} ${setPageTitle?"" : ""}</h2>${body}<div class="actions"><button id="cancelForm" class="secondary">Cancelar</button><button id="saveFormBtn">💾 GUARDAR</button></div></div>`;
+ $("cancelForm").addEventListener("click",()=>nav(type==="persona"?"personas":type==="vehiculo"?"vehiculos":type==="ubicacion"?"ubicaciones":"relaciones"));
+ $("saveFormBtn").addEventListener("click",()=>saveForm(type));
+ const inputs=[["f_photo","photoPreview"],["f_vehicle_photos","vehiclePreview"],["f_loc_photo","locPreview"]];
+ inputs.forEach(([a,b])=>{const el=$(a);if(el)el.addEventListener("change",()=>previewFiles(el,$(b)))});
+}
+function previewFiles(input,box){box.innerHTML="";[...input.files].forEach(f=>{const r=new FileReader();r.onload=()=>{const img=document.createElement("img");img.src=r.result;box.appendChild(img)};r.readAsDataURL(f)})}
+
+async function saveForm(type){
+ if(type==="persona"){
+  const name=$("f_name").value.trim(); if(!name){alert("El nombre es obligatorio.");$("f_name").focus();return}
+  db.people.push({id:uid(),t:Date.now(),name,idnum:$("f_id").value.trim(),phone:$("f_phone").value.trim(),email:$("f_email").value.trim(),note:$("f_notes").value.trim(),photo:await readFile($("f_photo").files[0])});
+  save();nav("personas");alert("Persona guardada correctamente.");return;
+ }
+ if(type==="vehiculo"){
+  const make=$("f_make").value.trim(),model=$("f_model").value.trim();if(!make||!model){alert("Marca y modelo son obligatorios.");return}
+  const photos=[];for(const f of $("f_vehicle_photos").files)photos.push(await readFile(f));
+  db.vehicles.push({id:uid(),t:Date.now(),make,model,year:$("f_year").value.trim(),plate:$("f_plate").value.trim(),vin:$("f_vin").value.trim(),owner:$("f_owner").value,note:$("f_vehicle_notes").value.trim(),photos});save();nav("vehiculos");alert("Vehículo guardado.");return;
+ }
+ if(type==="ubicacion"){
+  const name=$("f_loc_name").value.trim();if(!name){alert("El nombre es obligatorio.");return}
+  db.locations.push({id:uid(),t:Date.now(),name,address:$("f_address").value.trim(),lat:$("f_lat").value.trim(),lng:$("f_lng").value.trim(),note:$("f_loc_notes").value.trim(),photo:await readFile($("f_loc_photo").files[0])});save();nav("ubicaciones");alert("Lugar guardado.");return;
+ }
+ if(type==="relacion"){
+  const a=$("f_a").value,b=$("f_b").value;if(!a||!b||a===b){alert("Selecciona dos personas diferentes.");return}
+  db.relations.push({id:uid(),t:Date.now(),a,b,type:$("f_type").value.trim(),note:$("f_relation_notes").value.trim()});save();nav("relaciones");alert("Relación guardada.");return;
+ }
+}
+function viewPerson(id){
+ const p=person(id);if(!p)return;const links=db.relations.filter(r=>r.a===id||r.b===id).map(r=>person(r.a===id?r.b:r.a)).filter(Boolean);const vs=db.vehicles.filter(v=>v.owner===id);
+ setPageTitle("Ficha de persona");$("app").innerHTML=`<div class="panel"><button id="backP" class="secondary">← Volver</button><div class="row" style="margin-top:15px">${p.photo?`<img class="avatar" style="width:88px;height:88px" src="${p.photo}">`:`<div class="avatar" style="width:88px;height:88px">👤</div>`}<div><h2>${esc(p.name)}</h2><div class="muted">${esc(p.idnum||"Sin identificación")}</div><div class="muted">${esc(p.phone||"")}</div><div class="muted">${esc(p.email||"")}</div></div></div><p>${esc(p.note||"Sin notas")}</p></div><div class="panel"><h3>🚗 Vehículos (${vs.length})</h3>${vs.map(v=>`<div class="result" data-v="${v.id}">🚗 <span><b>${esc(v.make)} ${esc(v.model)}</b><br><span class="muted">${esc(v.plate||"-")} · ${esc(v.vin||"-")}</span></span></div>`).join("")||'<div class="empty">Sin vehículos.</div>'}</div><div class="panel"><h3>🔗 Personas vinculadas (${links.length})</h3>${links.map(x=>`<div class="result" data-p="${x.id}">👤 <b>${esc(x.name)}</b></div>`).join("")||'<div class="empty">Sin vínculos.</div>'}</div>`;
+ $("backP").addEventListener("click",()=>nav("personas"));document.querySelectorAll("[data-v]").forEach(b=>b.addEventListener("click",()=>viewVehicle(b.dataset.v)));document.querySelectorAll("[data-p]").forEach(b=>b.addEventListener("click",()=>viewPerson(b.dataset.p)));
+}
+function viewVehicle(id){const v=vehicle(id);if(!v)return;setPageTitle("Ficha de vehículo");$("app").innerHTML=`<div class="panel"><button id="backV" class="secondary">← Volver</button><h2>🚗 ${esc(v.make)} ${esc(v.model)}</h2><p>Placa: <b>${esc(v.plate||"-")}</b><br>VIN: <b>${esc(v.vin||"-")}</b><br>Año: ${esc(v.year||"-")}</p>${v.owner?`<button id="ownerBtn">👤 ${esc(person(v.owner)?.name||"?")}</button>`:""}<div class="gallery">${(v.photos||[]).map(x=>`<img src="${x}">`).join("")}</div><p class="muted">${esc(v.note||"Sin notas")}</p></div>`;$("backV").addEventListener("click",()=>nav("vehiculos"));if(v.owner)$("ownerBtn").addEventListener("click",()=>viewPerson(v.owner))}
+function viewLocation(id){const l=location(id);if(!l)return;setPageTitle("Ficha de lugar");$("app").innerHTML=`<div class="panel"><button id="backL" class="secondary">← Volver</button><h2>📍 ${esc(l.name)}</h2><p>${esc(l.address||"")}</p><p class="muted">${esc(l.lat||"-")}, ${esc(l.lng||"-")}</p>${l.photo?`<img style="width:100%;border-radius:12px" src="${l.photo}">`:""}<p>${esc(l.note||"Sin notas")}</p></div>`;$("backL").addEventListener("click",()=>nav("ubicaciones"))}
+function search(){
+ const q=$("globalSearch").value.trim().toLowerCase();if(!q){nav("inicio");return}
+ const ps=db.people.filter(x=>JSON.stringify(x).toLowerCase().includes(q)),vs=db.vehicles.filter(x=>JSON.stringify(x).toLowerCase().includes(q)),ls=db.locations.filter(x=>JSON.stringify(x).toLowerCase().includes(q));
+ const linked=[];ps.forEach(p=>db.relations.filter(r=>r.a===p.id||r.b===p.id).forEach(r=>{const x=person(r.a===p.id?r.b:r.a);if(x&&!linked.some(y=>y.id===x.id))linked.push(x)}));
+ setPageTitle("Resultados");$("app").innerHTML=`<div class="panel"><h3>🔎 Resultados</h3>${ps.map(p=>`<div class="result" data-sp="${p.id}">👤 <b>${esc(p.name)}</b><span class="muted">${esc(p.idnum||"")}</span></div>`).join("")}${vs.map(v=>`<div class="result" data-sv="${v.id}">🚗 <b>${esc(v.make)} ${esc(v.model)}</b><span class="muted">${esc(v.plate||"")}</span></div>`).join("")}${ls.map(l=>`<div class="result" data-sl="${l.id}">📍 <b>${esc(l.name)}</b><span class="muted">${esc(l.address||"")}</span></div>`).join("")}${(!ps.length&&!vs.length&&!ls.length)?'<div class="empty">Sin resultados directos.</div>':""}</div><div class="panel"><h3>🔗 Personas vinculadas</h3>${linked.map(p=>`<div class="result" data-lp="${p.id}">👤 <b>${esc(p.name)}</b></div>`).join("")||'<div class="empty">No hay vínculos.</div>'}</div>`;
+ document.querySelectorAll("[data-sp],[data-lp]").forEach(b=>b.addEventListener("click",()=>viewPerson(b.dataset.sp||b.dataset.lp)));
+ document.querySelectorAll("[data-sv]").forEach(b=>b.addEventListener("click",()=>viewVehicle(b.dataset.sv)));
+ document.querySelectorAll("[data-sl]").forEach(b=>b.addEventListener("click",()=>viewLocation(b.dataset.sl)));
+}
+document.querySelectorAll(".bottom button").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.page)));
+$("fab").addEventListener("click",()=>showForm("persona"));
+$("searchBtn").addEventListener("click",search);
+$("globalSearch").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
+nav("inicio");
+</script>
+</body>
+</html>
