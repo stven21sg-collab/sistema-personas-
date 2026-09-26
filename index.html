@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>Sistema de Gestión</title>
+<style>
+:root{--bg:#080c16;--panel:#111827;--panel2:#172033;--line:#263248;--text:#f5f7fb;--muted:#98a2b3;--accent:#4f8cff;--accent2:#6c5ce7;--danger:#ef5350;--ok:#27c281;--shadow:0 14px 35px #0005}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#18233a 0,#080c16 38%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}
+.app{max-width:1050px;margin:auto;padding:18px 16px 100px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:25px;box-shadow:0 8px 25px #4f8cff44}.brand h1{font-size:20px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.iconbtn{width:44px;height:44px;border-radius:14px;background:#ffffff10;color:white;border:1px solid var(--line)}
+.hero{background:linear-gradient(135deg,#172746,#111827 60%,#1b1836);border:1px solid #ffffff12;border-radius:26px;padding:24px;box-shadow:var(--shadow);margin-bottom:18px}.hero h2{margin:0 0 7px;font-size:28px}.hero p{margin:0 0 18px;color:#b8c1d1}.search{display:flex;align-items:center;gap:10px;background:#080c16aa;border:1px solid var(--line);border-radius:16px;padding:0 14px}.search input{width:100%;padding:14px 0;background:transparent;border:0;outline:0;color:white}.hero #searchResults .panel{background:#0b1322ee;border-color:#30415e}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{min-height:150px;text-align:left;color:white;background:linear-gradient(145deg,#151f32,#0f1624);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 8px 24px #0003;transition:.15s}.card:active{transform:scale(.98)}.card .ico{font-size:32px}.card h3{margin:12px 0 5px;font-size:19px}.card p{margin:0;color:var(--muted);font-size:13px}
+.view{display:none}.view.active{display:block}.back{background:#ffffff0b;border:1px solid var(--line);color:#fff;border-radius:13px;padding:10px 14px;margin-bottom:15px}.title{font-size:25px;margin:5px 0 4px}.subtitle{color:var(--muted);margin:0 0 18px}.panel{background:#101827;border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:16px}.field{margin-bottom:14px}.field label{display:block;font-size:13px;color:#c4ccda;margin:0 0 7px}.field input,.field textarea,.field select{width:100%;background:#0a101c;color:#fff;border:1px solid #2a3750;border-radius:13px;padding:13px;outline:0}.field textarea{min-height:100px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.primary{width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700}.secondary{padding:11px 14px;border-radius:12px;background:#ffffff0d;color:#fff;border:1px solid var(--line)}
+.photoBox{text-align:center;padding:10px 0 15px}.avatar{width:115px;height:115px;margin:0 auto 12px;border-radius:50%;background:#1c2738;border:2px dashed #51617d;display:grid;place-items:center;overflow:hidden;font-size:35px}.avatar img{width:100%;height:100%;object-fit:cover}.photoBtns{display:flex;justify-content:center;gap:10px}.photoBtns label{padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:#ffffff0a;font-size:13px;cursor:pointer}.photoBtns input{display:none}.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.thumbs img{width:68px;height:68px;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
+.list{display:grid;gap:10px}.item{display:flex;align-items:center;gap:12px;padding:13px;background:#0c1320;border:1px solid var(--line);border-radius:15px}.mini{width:46px;height:46px;border-radius:13px;object-fit:cover;background:#1b2638;display:grid;place-items:center}.item main{flex:1}.item strong{display:block}.item small{color:var(--muted)}.item button{background:#ffffff0b;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px}
+.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}
+.tree{overflow:auto;padding:15px 5px}.nodeWrap{display:flex;flex-direction:column;align-items:center;min-width:max-content}.node{background:linear-gradient(145deg,#18253c,#101827);border:1px solid #385174;border-radius:17px;padding:12px 15px;min-width:150px;text-align:center;box-shadow:0 8px 20px #0003;position:relative}.nodePhoto{width:54px;height:54px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 8px;border:2px solid #4b6388;background:#1b2638}.nodePlaceholder{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;background:#1b2638;border:2px solid #4b6388;font-size:22px}.node b{display:block}.node span{display:block;color:#8fb4ff;font-size:12px;margin-top:4px}.children{display:flex;gap:18px;align-items:flex-start;margin-top:26px;position:relative}.children:before{content:"";position:absolute;top:-13px;left:10%;right:10%;border-top:2px solid #31435f}.child{position:relative}.child:before{content:"";position:absolute;top:-26px;left:50%;height:26px;border-left:2px solid #31435f}.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}.sheet{width:min(650px,100%);max-height:90vh;overflow:auto;background:#101827;border:1px solid var(--line);border-radius:25px 25px 0 0;padding:20px}.sheetHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.close{background:#ffffff0c;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 11px}.checklist{display:grid;gap:8px;max-height:240px;overflow:auto}.check{display:flex;gap:10px;align-items:center;padding:10px;background:#0b111d;border:1px solid var(--line);border-radius:12px}.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%) translateY(20px);background:#172033;color:white;border:1px solid var(--line);padding:12px 16px;border-radius:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:600px){.app{padding:14px 12px 90px}.grid{gap:10px}.card{min-height:135px;padding:16px}.hero{padding:20px}.row{grid-template-columns:1fr}.children{gap:10px}.node{min-width:125px;padding:10px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><div class="logo">🕸️</div><div><h1>Sistema de Gestión</h1><p>Personas · Vehículos · Grupos · Red</p></div></div>
+  <button class="iconbtn" onclick="goHome()">⌂</button>
+</header>
+
+<section id="home" class="view active">
+  <div class="hero">
+    <h2>Panel principal</h2>
+    <p>Administra tus personas, vehículos, grupos y estructura de red.</p>
+    <div class="search">🔎 <input id="globalSearch" placeholder="Buscar persona, cédula, placa o grupo" oninput="globalSearch()"></div>
+    <div id="searchResults" style="margin-top:14px"></div>
+  </div>
+  <div class="grid">
+    <button class="card" onclick="openView('people')"><div class="ico">👤</div><h3>Personas</h3><p>Registrar y consultar fichas.</p></button>
+    <button class="card" onclick="openView('vehicles')"><div class="ico">🚗</div><h3>Vehículos</h3><p>Registrar vehículos y propietarios.</p></button>
+    <button class="card" onclick="openView('groups')"><div class="ico">👥</div><h3>Grupos</h3><p>Crear grupos y generar la red.</p></button>
+    <button class="card" onclick="openView('network')"><div class="ico">🕸️</div><h3>Red</h3><p>Editar la estructura jerárquica.</p></button>
+  </div>
+</section>
+
+<section id="people" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">👤 Personas</h2><p class="subtitle">Registra la ficha de cada persona.</p>
+<div class="panel">
+<div class="photoBox"><div class="avatar" id="personAvatar">👤</div><div class="photoBtns">
+<label>📷 Cámara<input id="camera" type="file" accept="image/*" capture="environment" onchange="setProfile(this)"></label>
+<label>🖼️ Galería<input id="gallery" type="file" accept="image/*" onchange="setProfile(this)"></label>
+</div></div>
+<div class="field"><label>Nombre completo *</label><input id="pName"></div>
+<div class="field"><label>Identificación / cédula</label><input id="pId"></div>
+<div class="field"><label>Ubicación / dirección</label><input id="pLocation"></div>
+<div class="field"><label>Fotos adicionales de la persona</label><input type="file" id="pPhotos" accept="image/*" multiple onchange="previewPhotos(this,'pThumbs')"><div id="pThumbs" class="thumbs"></div></div>
+<div class="field"><label>Fotos de la casa / ubicación</label><input type="file" id="housePhotos" accept="image/*" multiple onchange="previewPhotos(this,'hThumbs')"><div id="hThumbs" class="thumbs"></div></div>
+<div class="field"><label>Notas</label><textarea id="pNotes"></textarea></div>
+<button class="primary" onclick="savePerson()">💾 Guardar persona</button>
+</div>
+<div id="peopleList" class="list"></div>
+</section>
+
+<section id="vehicles" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">🚗 Vehículos</h2><p class="subtitle">Registra vehículos y relaciónalos con una persona.</p>
+<div class="panel">
+<div class="row"><div class="field"><label>Marca</label><input id="vMake"></div><div class="field"><label>Modelo</label><input id="vModel"></div></div>
+<div class="row"><div class="field"><label>Año</label><input id="vYear" type="number"></div><div class="field"><label>Placa</label><input id="vPlate"></div></div>
+<div class="field"><label>Propietario</label><select id="vOwner"><option value="">Sin propietario</option></select></div>
+<div class="field"><label>Fotos</label><input type="file" id="vPhotos" accept="image/*" multiple onchange="previewPhotos(this,'vThumbs')"><div id="vThumbs" class="thumbs"></div></div>
+<div class="field"><label>Notas</label><textarea id="vNotes"></textarea></div>
+<button class="primary" onclick="saveVehicle()">💾 Guardar vehículo</button>
+<p style="color:#98a2b3;font-size:12px;margin:10px 0 0;text-align:center">Después de guardarlo, toca el vehículo para abrir su ficha completa.</p>
+</div><div id="vehicleList" class="list"></div>
+</section>
+
+<section id="groups" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">👥 Grupos</h2><p class="subtitle">Elige un líder y agrega los integrantes. La red se genera automáticamente.</p>
+<div class="panel">
+<div class="field"><label>Nombre del grupo *</label><input id="gName" placeholder="Ej. Zona Norte"></div>
+<div class="field"><label>Principal líder *</label><select id="gLeader"></select></div>
+<div class="field"><label>Personas del grupo</label><div id="memberChecks" class="checklist"></div></div>
+<button class="primary" onclick="saveGroup()">💾 Crear grupo y generar red</button>
+</div><div id="groupList" class="list"></div>
+</section>
+
+<section id="network" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">🕸️ Redes</h2><p class="subtitle">Cada grupo tiene su propia red. Puedes cambiar entre ellas sin mezclar sus integrantes.</p>
+<div class="panel">
+<div class="field"><label>Red / grupo que estás viendo</label><select id="networkSelector" onchange="switchNetwork(this.value)"></select></div>
+</div>
+<div class="tools"><button class="secondary" onclick="addNode()">＋ Agregar debajo</button><button class="secondary" onclick="editRole()">✏️ Editar cargo</button><button class="secondary" onclick="chooseLeader()">⭐ Elegir líder</button></div>
+<div id="selectedInfo" class="panel" style="padding:13px">Selecciona una persona en la red para editarla.</div>
+<div id="tree" class="tree"></div>
+</section>
+</div>
+
+<div id="modal" class="modal"><div class="sheet"><div class="sheetHead"><b id="modalTitle">Editar</b><button class="close" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const KEY='sistemaGestionV1';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{people:[],vehicles:[],groups:[],networks:[]};
+if(!Array.isArray(db.networks)) db.networks=[];
+/* Compatibilidad con la versión anterior: convierte la red única en la red del primer grupo. */
+if(db.network && !db.networks.length){
+  if(db.groups.length && db.network.leaderId){
+    db.networks.push({groupId:db.groups[0].id,leaderId:db.network.leaderId,links:db.network.links||[]});
+  }
+  delete db.network;
+}
+let profileData='', personPhotos=[], housePhotos=[], vehiclePhotos=[], selectedNode=null, currentNetworkGroupId=null;
+
+function saveDB(){localStorage.setItem(KEY,JSON.stringify(db));}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
+function openView(id){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='network'&&!currentNetworkGroupId&&db.groups.length)currentNetworkGroupId=db.groups[0].id;renderAll();scrollTo(0,0)}
+function goHome(){openView('home')}
+function setProfile(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{profileData=r.result;document.getElementById('personAvatar').innerHTML='<img src="'+profileData+'">'};r.readAsDataURL(f)}
+function previewPhotos(input,target){const arr=target==='pThumbs'?personPhotos:target==='hThumbs'?housePhotos:vehiclePhotos;Array.from(input.files).forEach(f=>{const r=new FileReader();r.onload=()=>{arr.push(r.result);renderThumbs(target,arr)};r.readAsDataURL(f)})}
+function renderThumbs(id,arr){document.getElementById(id).innerHTML=arr.map(x=>'<img src="'+x+'">').join('')}
+function resetPerson(){profileData='';personPhotos=[];housePhotos=[];document.getElementById('personAvatar').innerHTML='👤';['pName','pId','pLocation','pNotes'].forEach(x=>document.getElementById(x).value='');document.getElementById('pThumbs').innerHTML='';document.getElementById('hThumbs').innerHTML='';}
+function savePerson(){const name=pName.value.trim();if(!name){toast('Escribe el nombre');return}db.people.push({id:crypto.randomUUID(),name,cedula:pId.value.trim(),location:pLocation.value.trim(),profile:profileData,photos:[...personPhotos],housePhotos:[...housePhotos],notes:pNotes.value.trim(),created:Date.now()});saveDB();resetPerson();renderAll();toast('Persona guardada');}
+function saveVehicle(){if(!vMake.value.trim()&&!vModel.value.trim()&&!vPlate.value.trim()){toast('Completa al menos marca, modelo o placa');return}db.vehicles.push({id:crypto.randomUUID(),make:vMake.value.trim(),model:vModel.value.trim(),year:vYear.value,plate:vPlate.value.trim(),owner:vOwner.value,photos:[...vehiclePhotos],notes:vNotes.value.trim()});saveDB();['vMake','vModel','vYear','vPlate','vNotes'].forEach(x=>document.getElementById(x).value='');vehiclePhotos=[];vThumbs.innerHTML='';renderAll();toast('Vehículo guardado');}
+function saveGroup(){
+  const name=document.getElementById('gName').value.trim();
+  const leader=document.getElementById('gLeader').value;
+  const members=[...document.querySelectorAll('#memberChecks input:checked')].map(x=>x.value);
+  if(!name){toast('Escribe el nombre del grupo');return}
+  if(!leader){toast('Selecciona el principal líder');return}
+  if(!members.includes(leader))members.push(leader);
+
+  const groupId=crypto.randomUUID();
+  const group={id:groupId,name,leader,members};
+  const links=members.filter(id=>id!==leader).map(id=>({
+    parent:leader,child:id,role:'Integrante'
+  }));
+
+  db.groups.push(group);
+  db.networks.push({
+    groupId:groupId,
+    leaderId:leader,
+    links:links
+  });
+
+  currentNetworkGroupId=groupId;
+  selectedNode=null;
+  document.getElementById('gName').value='';
+  saveDB();
+  renderAll();
+  openView('network');
+  toast('✅ Grupo creado: red generada automáticamente');
+}
+
+function renderPeople(){peopleList.innerHTML=db.people.length?db.people.map(p=>`<div class="item"><div class="mini">${p.profile?`<img class="mini" src="${p.profile}">`:'👤'}</div><main><strong>${esc(p.name)}</strong><small>${esc(p.cedula||'Sin cédula')} · ${esc(p.location||'Sin ubicación')}</small></main><button onclick="showPerson('${p.id}')">Ver</button></div>`).join(''):'<div class="empty">No hay personas registradas.</div>';vOwner.innerHTML='<option value="">Sin propietario</option>'+db.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');gLeader.innerHTML=db.people.length?db.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join(''):'<option value="">Primero registra personas</option>';memberChecks.innerHTML=db.people.map(p=>`<label class="check"><input type="checkbox" value="${p.id}"> ${esc(p.name)}</label>`).join('')||'<div class="empty">Primero registra personas.</div>'}
+function renderVehicles(){
+  vehicleList.innerHTML=db.vehicles.length?db.vehicles.map(v=>{
+    let o=db.people.find(p=>p.id===v.owner);
+    let photo=v.photos?.[0];
+    return `<div class="item">
+      <div class="mini">${photo?`<img class="mini" src="${photo}" style="object-fit:cover">`:'🚗'}</div>
+      <main><strong>${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</strong>
+      <small>Placa: ${esc(v.plate||'Sin placa')} · Propietario: ${esc(o?.name||'Sin propietario')}</small></main>
+      <button onclick="showVehicle('${v.id}')">👁️ Ver</button>
+      <button onclick="deleteVehicle('${v.id}')">🗑️</button>
+    </div>`
+  }).join(''):'<div class="empty">No hay vehículos registrados.</div>'
+}
+function showVehicle(id){
+  const v=db.vehicles.find(x=>x.id===id); if(!v)return;
+  const owner=db.people.find(p=>p.id===v.owner);
+  const photos=v.photos||[];
+  const mainPhoto=photos[0];
+  const ownerGroups=owner?db.groups.filter(g=>g.members.includes(owner.id)).map(g=>{
+    const net=db.networks.find(n=>n.groupId===g.id);
+    const link=net?.links.find(l=>l.child===owner.id);
+    const role=owner.id===g.leader?'Principal líder':(link?.role||'Integrante');
+    return `<p><b>👥 Grupo:</b> ${esc(g.name)}<br><b>🏷️ Cargo:</b> ${esc(role)}</p>`;
+  }).join(''):'';
+  openModal('Ficha del vehículo',`
+    ${mainPhoto?`<img src="${mainPhoto}" style="width:100%;max-height:280px;object-fit:cover;border-radius:18px;margin-bottom:15px">`:`<div style="height:180px;border-radius:18px;background:#1b2638;display:grid;place-items:center;font-size:55px;margin-bottom:15px">🚗</div>`}
+    <div class="panel" style="margin:0 0 14px">
+      <h3 style="margin:0 0 12px">${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</h3>
+      <p><b>👤 De quién es:</b> ${esc(owner?.name||'Sin propietario')}</p>
+      ${owner?.location?`<p><b>📍 Dónde se maneja / ubicación:</b> ${esc(owner.location)}</p>`:''}
+      <p><b>🔢 Placa:</b> ${esc(v.plate||'Sin placa')}</p>
+      <p><b>📅 Año:</b> ${esc(v.year||'No indicado')}</p>
+      <p><b>🏷️ Marca:</b> ${esc(v.make||'No indicada')}</p>
+      <p><b>🚗 Modelo:</b> ${esc(v.model||'No indicado')}</p>
+      ${ownerGroups||'<p><b>👥 Grupo:</b> Sin grupo asignado</p>'}
+      <p><b>📝 Características / notas:</b><br>${esc(v.notes||'Sin notas')}</p>
+    </div>
+    ${photos.length>1?`<div><b>📷 Fotos del vehículo</b><div class="thumbs">${photos.map(x=>`<img src="${x}" style="width:90px;height:90px">`).join('')}</div></div>`:''}
+    <button class="primary" style="margin-top:16px" onclick="deleteVehicleFromDetail('${v.id}')">🗑️ Eliminar vehículo</button>
+  `);
+}
+
+function deleteVehicleFromDetail(id){
+  if(!confirm('¿Eliminar vehículo?'))return;
+  db.vehicles=db.vehicles.filter(v=>v.id!==id);
+  saveDB();closeModal();renderAll();toast('Vehículo eliminado');
+}
+function renderGroups(){groupList.innerHTML=db.groups.length?db.groups.map(g=>{let l=db.people.find(p=>p.id===g.leader);return `<div class="item"><div class="mini">👥</div><main><strong>${esc(g.name)}</strong><small>Líder: ${esc(l?.name||'—')} · ${g.members.length} personas</small></main><button onclick="viewNetwork('${g.id}')">🕸️ Red</button><button onclick="editGroup('${g.id}')">✏️ Editar</button></div>`}).join(''):'<div class="empty">No hay grupos creados.</div>'}
+function viewNetwork(groupId){currentNetworkGroupId=groupId;selectedNode=null;openView('network')}
+function editGroup(groupId){
+  const g=db.groups.find(x=>x.id===groupId); if(!g)return;
+  const leader=db.people.find(p=>p.id===g.leader);
+  openModal('Editar grupo',`
+    <div class="field"><label>Nombre del grupo</label><input id="editGroupName" value="${esc(g.name)}"></div>
+    <div class="field"><label>Principal líder</label><input value="${esc(leader?.name||'—')}" disabled></div>
+    <div class="field"><label>Integrantes guardados</label>
+      <div class="checklist">${db.people.map(p=>`
+        <label class="check">
+          <input type="checkbox" class="editMember" value="${p.id}" ${g.members.includes(p.id)?'checked':''} ${p.id===g.leader?'disabled':''}>
+          ${p.profile?`<img src="${p.profile}" style="width:34px;height:34px;border-radius:50%;object-fit:cover">`:'👤'}
+          <span>${esc(p.name)}</span>
+          ${p.id===g.leader?'<small style="margin-left:auto;color:#8fb4ff">LÍDER</small>':''}
+        </label>`).join('')}
+      </div>
+    </div>
+    <button class="primary" onclick="saveGroupEdit('${g.id}')">💾 Guardar cambios</button>
+  `);
+}
+function saveGroupEdit(groupId){
+  const g=db.groups.find(x=>x.id===groupId); if(!g)return;
+  const name=editGroupName.value.trim(); if(!name){toast('Escribe un nombre para el grupo');return}
+  const selected=[...document.querySelectorAll('.editMember:checked')].map(x=>x.value);
+  if(!selected.includes(g.leader))selected.push(g.leader);
+  const oldMembers=[...g.members];
+  g.name=name; g.members=selected;
+  let net=getNetwork(groupId);
+  if(!net){net={groupId,leaderId:g.leader,links:[]};db.networks.push(net)}
+  const oldLinks=net.links;
+  selected.filter(id=>id!==g.leader).forEach(id=>{
+    if(!net.links.some(l=>l.child===id)) net.links.push({parent:g.leader,child:id,role:'Integrante'});
+  });
+  oldMembers.filter(id=>!selected.includes(id)&&id!==g.leader).forEach(id=>{
+    net.links=net.links.filter(l=>l.child!==id);
+  });
+  currentNetworkGroupId=groupId;selectedNode=null;saveDB();closeModal();renderAll();toast('Grupo actualizado');
+}
+function getNetwork(groupId=currentNetworkGroupId){
+  return db.networks.find(n=>n.groupId===groupId);
+}
+function ensureCurrentNetwork(){
+  if(!currentNetworkGroupId && db.groups.length) currentNetworkGroupId=db.groups[0].id;
+  let net=getNetwork();
+  if(!net && currentNetworkGroupId){
+    const g=db.groups.find(x=>x.id===currentNetworkGroupId);
+    if(g){
+      net={
+        groupId:g.id,
+        leaderId:g.leader,
+        links:g.members.filter(id=>id!==g.leader).map(id=>({parent:g.leader,child:id,role:'Integrante'}))
+      };
+      db.networks.push(net);
+      saveDB();
+    }
+  }
+  return net;
+}
+function ensureAllNetworks(){
+  let changed=false;
+  db.groups.forEach(g=>{
+    if(!db.networks.some(n=>n.groupId===g.id)){
+      db.networks.push({
+        groupId:g.id,
+        leaderId:g.leader,
+        links:g.members.filter(id=>id!==g.leader).map(id=>({parent:g.leader,child:id,role:'Integrante'}))
+      });
+      changed=true;
+    }
+  });
+  if(changed)saveDB();
+}
+function switchNetwork(groupId){
+  currentNetworkGroupId=groupId||null;selectedNode=null;renderNetworkControls();renderTree();
+}
+function renderNetworkControls(){
+  const sel=document.getElementById('networkSelector'); if(!sel)return;
+  sel.innerHTML=db.groups.length?db.groups.map(g=>`<option value="${g.id}" ${g.id===currentNetworkGroupId?'selected':''}>${esc(g.name)}</option>`).join(''):'<option value="">No hay redes creadas</option>';
+}
+
+function renderTree(){
+  renderNetworkControls();
+  const net=ensureCurrentNetwork();
+  if(!net){tree.innerHTML='<div class="empty">Crea un grupo para generar su red.</div>';return}
+  const root=db.people.find(p=>p.id===net.leaderId);
+  if(!root){tree.innerHTML='<div class="empty">Esta red no tiene un líder válido.</div>';return}
+  tree.innerHTML=nodeHTML(root.id,true);
+}
+function nodeHTML(id,isRoot=false){
+  const p=db.people.find(x=>x.id===id);if(!p)return'';
+  const net=ensureCurrentNetwork();if(!net)return'';
+  const links=net.links.filter(l=>l.parent===id);
+  const role=isRoot?'Principal líder':(linksRole(id)||'Integrante');
+  const photo=p.profile?`<img class="nodePhoto" src="${p.profile}" alt="">`:`<div class="nodePlaceholder">👤</div>`;
+  return `<div class="nodeWrap"><button class="node" onclick="selectNode('${id}')">${photo}<b>${esc(p.name)}</b><span>${esc(role)}</span></button>${links.length?`<div class="children">${links.map(l=>`<div class="child">${nodeHTML(l.child)}</div>`).join('')}</div>`:''}</div>`;
+}
+
+function linksRole(id){const net=ensureCurrentNetwork();return net?.links.find(l=>l.child===id)?.role}
+function selectNode(id){const net=ensureCurrentNetwork();selectedNode=id;const p=db.people.find(x=>x.id===id);selectedInfo.innerHTML=`<b>Seleccionado:</b> ${esc(p?.name||'')}<br><small>Cargo: ${esc(id===net?.leaderId?'Principal líder':(linksRole(id)||'Integrante'))}</small>`;renderTree()}
+function addNode(){if(!selectedNode){toast('Selecciona primero una persona');return}const net=ensureCurrentNetwork();if(!net){toast('No hay una red seleccionada');return}const available=db.people.filter(p=>p.id!==selectedNode&&!net.links.some(l=>l.child===p.id));if(!available.length){toast('No hay personas disponibles');return}openModal('Agregar persona debajo',`<div class="field"><label>Persona</label><select id="addPerson">${available.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`)}</select></div><div class="field"><label>Cargo</label><input id="addRole" value="Integrante"></div><button class="primary" onclick="confirmAdd()">Agregar a la red</button>`)}
+function confirmAdd(){const net=ensureCurrentNetwork();const id=addPerson.value;if(!net)return;if(net.links.some(l=>l.child===id)){toast('Esa persona ya está en la red');return}net.links.push({parent:selectedNode,child:id,role:addRole.value.trim()||'Integrante'});const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g&&!g.members.includes(id))g.members.push(id);saveDB();closeModal();renderAll();toast('Persona agregada')}
+function editRole(){const net=ensureCurrentNetwork();if(!selectedNode){toast('Selecciona una persona');return}if(selectedNode===net?.leaderId){toast('El líder principal no necesita cargo');return}const l=net?.links.find(x=>x.child===selectedNode);openModal('Editar cargo',`<div class="field"><label>Cargo / función</label><input id="editRoleInput" value="${esc(l?.role||'Integrante')}"></div><button class="primary" onclick="confirmRole()">Guardar cargo</button>`)}
+function confirmRole(){const net=ensureCurrentNetwork();const l=net?.links.find(x=>x.child===selectedNode);if(l)l.role=editRoleInput.value.trim()||'Integrante';saveDB();closeModal();renderTree();toast('Cargo actualizado')}
+function chooseLeader(){if(!db.people.length){toast('Primero registra personas');return}openModal('Elegir principal líder',`<div class="field"><label>Principal líder</label><select id="newLeader">${db.people.map(p=>`<option value="${p.id}" ${p.id===db.network.leaderId?'selected':''}>${esc(p.name)}</option>`)}</select></div><button class="primary" onclick="confirmLeader()">Guardar líder</button>`)}
+function confirmLeader(){const id=newLeader.value;db.network.leaderId=id;db.network.links=db.network.links.filter(l=>l.child!==id&&l.parent!==id);saveDB();closeModal();renderTree();toast('Líder actualizado')}
+function showPerson(id){
+  const p=db.people.find(x=>x.id===id);if(!p)return;
+  const vs=db.vehicles.filter(v=>v.owner===id);
+  const gs=db.groups.filter(g=>g.members.includes(id));
+  const groupHtml=gs.length?gs.map(g=>{
+    const net=db.networks.find(n=>n.groupId===g.id);
+    const link=net?.links.find(l=>l.child===id);
+    const role=id===g.leader?'Principal líder':(link?.role||'Integrante');
+    return `<div class="item"><div class="mini">👥</div><main><strong>${esc(g.name)}</strong><small>${esc(role)}</small></main><button onclick="viewNetwork('${g.id}');closeModal()">🕸️</button></div>`;
+  }).join(''):'<div class="empty">No pertenece a ningún grupo.</div>';
+  const vehicleHtml=vs.length?vs.map(v=>`<div class="item"><div class="mini">${v.photos?.[0]?`<img class="mini" src="${v.photos[0]}" style="object-fit:cover">`:'🚗'}</div><main><strong>${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</strong><small>Placa: ${esc(v.plate||'Sin placa')}</small></main><button onclick="showVehicle('${v.id}')">👁️</button></div>`).join(''):'<div class="empty">No tiene vehículos registrados.</div>';
+  openModal(p.name,`
+    <div style="text-align:center">${p.profile?`<img src="${p.profile}" style="width:110px;height:110px;border-radius:50%;object-fit:cover">`:'👤'}</div>
+    <p><b>Cédula:</b> ${esc(p.cedula||'—')}</p>
+    <p><b>Ubicación:</b> ${esc(p.location||'—')}</p>
+    <p><b>Notas:</b> ${esc(p.notes||'—')}</p>
+    <div class="panel"><b>🚗 Vehículos</b><div class="list" style="margin-top:10px">${vehicleHtml}</div></div>
+    <div class="panel"><b>👥 Grupos y cargos</b><div class="list" style="margin-top:10px">${groupHtml}</div></div>
+    <button class="primary" onclick="deletePerson('${id}')">🗑️ Eliminar persona</button>
+  `)
+}
+function deletePerson(id){if(!confirm('¿Eliminar esta persona?'))return;db.people=db.people.filter(p=>p.id!==id);db.vehicles=db.vehicles.filter(v=>v.owner!==id);db.groups.forEach(g=>g.members=g.members.filter(x=>x!==id));db.networks.forEach(n=>{n.links=n.links.filter(l=>l.parent!==id&&l.child!==id);if(n.leaderId===id)n.leaderId=null});saveDB();closeModal();renderAll();toast('Persona eliminada')}
+function deleteVehicle(id){if(!confirm('¿Eliminar vehículo?'))return;db.vehicles=db.vehicles.filter(v=>v.id!==id);saveDB();renderAll();toast('Vehículo eliminado')}
+function normalizeSearch(value){
+  return String(value??'')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .trim();
+}
+function normalizeSearch(value){
+  return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+}
+function globalSearch(){
+  const raw=document.getElementById('globalSearch').value;
+  const q=normalizeSearch(raw);
+  const box=document.getElementById('searchResults');
+  if(!q){box.innerHTML='';return}
+
+  const people=db.people.filter(p=>{
+    const groups=db.groups.filter(g=>g.members.includes(p.id)).map(g=>g.name).join(' ');
+    const vehicles=db.vehicles.filter(v=>v.owner===p.id).map(v=>[v.make,v.model,v.plate,v.year,v.notes].join(' ')).join(' ');
+    return normalizeSearch([p.name,p.cedula,p.location,p.notes,groups,vehicles].join(' ')).includes(q);
+  });
+
+  if(!people.length){
+    box.innerHTML='<div class="panel"><div class="empty">No encontré una persona relacionada con esa búsqueda.</div></div>';
+    return;
+  }
+
+  box.innerHTML=`
+    <div style="color:#b8c1d1;font-size:12px;margin-bottom:8px">
+      Resultados para “${esc(raw)}”
+    </div>
+    ${people.map(p=>{
+      const vs=db.vehicles.filter(v=>v.owner===p.id);
+      const gs=db.groups.filter(g=>g.members.includes(p.id));
+
+      const vehicleSection=vs.length ? vs.map(v=>`
+        <div class="item" style="margin-top:7px">
+          <div class="mini">${v.photos?.[0]?`<img class="mini" src="${v.photos[0]}" style="object-fit:cover">`:'🚗'}</div>
+          <main>
+            <strong>${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</strong>
+            <small>Placa: ${esc(v.plate||'Sin placa')} · Año: ${esc(v.year||'—')}</small>
+          </main>
+          <button onclick="showVehicle('${v.id}')">Ver</button>
+        </div>`).join('') :
+        '<div style="color:#98a2b3;font-size:13px;padding:8px 0">Sin vehículos registrados</div>';
+
+      const groupSection=gs.length ? gs.map(g=>{
+        const net=db.networks.find(n=>n.groupId===g.id);
+        const link=net?.links.find(l=>l.child===p.id);
+        const role=p.id===g.leader?'Principal líder':(link?.role||'Integrante');
+        return `<div class="item" style="margin-top:7px">
+          <div class="mini">👥</div>
+          <main><strong>${esc(g.name)}</strong><small>Cargo: ${esc(role)}</small></main>
+          <button onclick="viewNetwork('${g.id}')">Red</button>
+        </div>`;
+      }).join('') :
+        '<div style="color:#98a2b3;font-size:13px;padding:8px 0">Sin grupo asignado</div>';
+
+      return `
+      <div class="panel" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div class="mini" style="width:54px;height:54px">
+            ${p.profile?`<img class="mini" src="${p.profile}" style="width:54px;height:54px;object-fit:cover">`:'👤'}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:19px;font-weight:800">${esc(p.name)}</div>
+            <div style="font-size:12px;color:#98a2b3">
+              ${p.cedula?`Cédula: ${esc(p.cedula)}`:''}${p.location?` · 📍 ${esc(p.location)}`:''}
+            </div>
+          </div>
+          <button onclick="showPerson('${p.id}')">Ver</button>
+        </div>
+
+        <div style="border-top:1px solid #263248;padding-top:12px">
+          <div style="font-weight:700;font-size:14px">🚗 VEHÍCULO</div>
+          ${vehicleSection}
+        </div>
+
+        <div style="border-top:1px solid #263248;margin-top:12px;padding-top:12px">
+          <div style="font-weight:700;font-size:14px">👥 GRUPO AL QUE PERTENECE</div>
+          ${groupSection}
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+function openModal(title,body){modalTitle.textContent=title;modalBody.innerHTML=body;modal.classList.add('show')}
+function closeModal(){modal.classList.remove('show')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderAll(){ensureAllNetworks();if(!currentNetworkGroupId&&db.groups.length)currentNetworkGroupId=db.groups[0].id;renderPeople();renderVehicles();renderGroups();renderTree()}
+renderAll();
+</script>
+</body>
+</html>
