@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>Sistema IN OMNIA PARATUS</title>
+<style>
+:root{--bg:#000000;--panel:#090909;--panel2:#172033;--line:#263248;--text:#f5f7fb;--muted:#98a2b3;--accent:#ff2028;--accent2:#b40008;--danger:#ef5350;--ok:#27c281;--shadow:0 14px 35px #0005}
+*{box-sizing:border-box}body{margin:0;background:#000;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}
+.app{max-width:1050px;margin:auto;padding:18px 16px 100px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px}.logo{width:54px;height:54px;border-radius:16px;background:#050505;border:2px solid var(--accent);display:grid;place-items:center;font-size:29px;color:#fff;box-shadow:0 0 18px rgba(255,32,40,.18)}.brand h1{font-size:20px;line-height:1.05;margin:0;white-space:nowrap}.brand h1 .red{color:var(--accent)}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.iconbtn{width:44px;height:44px;border-radius:14px;background:#ffffff10;color:white;border:1px solid var(--line)}
+.hero{background:linear-gradient(145deg,#0a0a0a,#020202);border:1px solid #ffffff12;border-radius:26px;padding:24px;box-shadow:var(--shadow);margin-bottom:18px}.hero h2{margin:0 0 7px;font-size:28px}.hero p{margin:0 0 18px;color:#b8c1d1}.search{display:flex;align-items:center;gap:10px;background:#050505;border:1px solid #2b2b2b;border-radius:18px;padding:0 14px;min-height:58px}.search .searchClear{width:34px;height:34px;border-radius:50%;background:#303030;color:#fff;display:none;place-items:center;font-size:19px;flex:none}.search.hasValue .searchClear{display:grid}
+.search input{min-width:0}
+.searchFilters{display:flex;gap:7px;overflow-x:auto;padding:10px 2px 2px;scrollbar-width:none}
+.searchFilters::-webkit-scrollbar{display:none}
+.searchFilter{flex:0 0 auto;padding:8px 12px;border-radius:11px;background:#0d1727;color:#aeb8c9;border:1px solid #2a3952;font-size:12px;font-weight:700}
+.searchFilter.active{background:#1677ff;color:#fff;border-color:#1677ff}
+.searchSection{background:#0b1320;border:1px solid #263751;border-radius:18px;padding:13px;margin-bottom:10px}
+.searchSectionTitle{font-weight:800;color:#59a2ff;font-size:14px;margin-bottom:9px}
+.searchPerson{display:flex;align-items:center;gap:11px;background:#101b2b;border:1px solid #243650;border-radius:15px;padding:11px}
+.searchPerson .avatarSmall{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#1b2638;display:grid;place-items:center;flex:0 0 52px}
+.searchVehicle{display:flex;align-items:center;gap:10px;background:#101b2b;border:1px solid #243650;border-radius:15px;padding:9px;margin-top:8px}
+.searchVehicle img,.searchVehicle .vehicleIcon{width:72px;height:58px;border-radius:11px;object-fit:cover;background:#1b2638;display:grid;place-items:center;flex:0 0 72px}
+.searchGroup{display:flex;align-items:center;gap:10px;background:#101b2b;border:1px solid #243650;border-radius:15px;padding:10px;margin-top:8px}
+.searchGroupIcon{width:52px;height:52px;border-radius:50%;background:#16a765;display:grid;place-items:center;font-size:25px;flex:0 0 52px}
+.searchAction{padding:9px 12px;border-radius:11px;background:#1677ff;color:#fff;font-weight:700;white-space:nowrap}
+.searchAction.purple{background:#6650e8}
+.search input{width:100%;padding:14px 0;background:transparent;border:0;outline:0;color:white;font-size:16px}.search input::placeholder{color:#9a9a9a}.hero #searchResults .panel{background:#0b1322ee;border-color:#30415e}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{min-height:150px;text-align:left;color:white;background:linear-gradient(145deg,#0a0a0a,#020202);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 8px 24px #0003;transition:.15s}.card:active{transform:scale(.98)}.card .ico{font-size:34px;color:#ff2028;filter:grayscale(1) sepia(1) saturate(10) hue-rotate(325deg);}.card h3{margin:12px 0 5px;font-size:19px}.card p{margin:0;color:var(--muted);font-size:13px}
+.view{display:none}.view.active{display:block}.back{background:#ffffff0b;border:1px solid var(--line);color:#fff;border-radius:13px;padding:10px 14px;margin-bottom:15px}.title{font-size:25px;margin:5px 0 4px}.subtitle{color:var(--muted);margin:0 0 18px}.panel{background:#101827;border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:16px}.field{margin-bottom:14px}.field label{display:block;font-size:13px;color:#c4ccda;margin:0 0 7px}.field input,.field textarea,.field select{width:100%;background:#0a101c;color:#fff;border:1px solid #2a3750;border-radius:13px;padding:13px;outline:0}.field textarea{min-height:100px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.primary{width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700}.secondary{padding:11px 14px;border-radius:12px;background:#ffffff0d;color:#fff;border:1px solid var(--line)}
+.photoBox{text-align:center;padding:10px 0 15px}.avatar{width:115px;height:115px;margin:0 auto 12px;border-radius:50%;background:#1c2738;border:2px dashed #51617d;display:grid;place-items:center;overflow:hidden;font-size:35px}.avatar img{width:100%;height:100%;object-fit:cover}.photoBtns{display:flex;justify-content:center;gap:10px}.photoBtns label{padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:#ffffff0a;font-size:13px;cursor:pointer}.photoBtns input{display:none}.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.thumbs img{width:68px;height:68px;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
+.list{display:grid;gap:10px}.item{display:flex;align-items:center;gap:12px;padding:13px;background:#0c1320;border:1px solid var(--line);border-radius:15px}.mini{width:46px;height:46px;border-radius:13px;object-fit:cover;background:#1b2638;display:grid;place-items:center}.item main{flex:1}.item strong{display:block}.item small{color:var(--muted)}.item button{background:#ffffff0b;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px}
+.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}
+.tree{overflow:auto;padding:15px 5px}.nodeWrap{display:flex;flex-direction:column;align-items:center;min-width:max-content}.node{background:linear-gradient(145deg,#18253c,#101827);border:1px solid #385174;border-radius:17px;padding:12px 15px;min-width:150px;text-align:center;box-shadow:0 8px 20px #0003;position:relative}.nodePhoto{width:54px;height:54px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 8px;border:2px solid #4b6388;background:#1b2638}.nodePlaceholder{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;margin:0 auto 8px;background:#1b2638;border:2px solid #4b6388;font-size:22px}.node b{display:block}.node span{display:block;color:#8fb4ff;font-size:12px;margin-top:4px}.children{display:flex;gap:18px;align-items:flex-start;margin-top:26px;position:relative}.children:before{content:"";position:absolute;top:-13px;left:10%;right:10%;border-top:2px solid #31435f}.child{position:relative}.child:before{content:"";position:absolute;top:-26px;left:50%;height:26px;border-left:2px solid #31435f}.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}.sheet{width:min(650px,100%);max-height:90vh;overflow:auto;background:#101827;border:1px solid var(--line);border-radius:25px 25px 0 0;padding:20px}.sheetHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.close{background:#ffffff0c;color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 11px}.checklist{display:grid;gap:8px;max-height:240px;overflow:auto}.check{display:flex;gap:10px;align-items:center;padding:10px;background:#0b111d;border:1px solid var(--line);border-radius:12px}.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%) translateY(20px);background:#172033;color:white;border:1px solid var(--line);padding:12px 16px;border-radius:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:600px){.app{padding:14px 12px 90px}.brand h1{font-size:17px}.grid{gap:10px}.card{min-height:135px;padding:16px}.hero{padding:20px}.row{grid-template-columns:1fr}.children{gap:10px}.node{min-width:125px;padding:10px;font-size:13px}}
+
+.approvedTheme{background:#000!important}
+.approvedTheme .card,.approvedTheme .panel,.approvedTheme .hero{background:linear-gradient(145deg,#090909,#020202)!important;border-color:#242424!important}
+.approvedTheme .card:hover{border-color:#ff2028!important;box-shadow:0 0 24px rgba(255,32,40,.12)}
+.approvedTheme .ico{filter:saturate(1.2)}
+.approvedTheme .search{background:#050505!important;border-color:#2b2b2b!important}
+.approvedTheme .search button,.approvedTheme .primary,.approvedTheme .searchAction{background:linear-gradient(135deg,#ff2028,#b40008)!important}
+.approvedTheme .searchFilter.active,.approvedTheme .searchTab.active{background:#ff2028!important}
+
+/* ===== DISEÑO EXACTO BASADO EN LA REFERENCIA ===== */
+html,body{background:#000!important}
+body{color:#f7f7f7!important;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif!important}
+.app{max-width:760px!important;padding:26px 22px 90px!important}
+.top{margin-bottom:34px!important;align-items:center!important}
+.brand{gap:14px!important}
+.logo{width:90px!important;height:90px!important;border-radius:18px!important;background:#050505!important;border:2px solid #d71920!important;box-shadow:none!important;overflow:hidden!important;background-image:url("data:image/png;base64,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")!important;background-size:cover!important;background-position:center!important;font-size:0!important}
+.brand h1{font-size:27px!important;line-height:1.05!important;font-weight:800!important;letter-spacing:-.5px!important}
+.brand h1 .red{color:#d71920!important}
+.brand p{font-size:16px!important;margin-top:7px!important;color:#a7a7ad!important}
+.iconbtn{width:62px!important;height:62px!important;border-radius:18px!important;background:#080808!important;border:1px solid #242424!important;font-size:28px!important}
+.hero{background:linear-gradient(145deg,#101010,#050505)!important;border:1px solid #272727!important;border-radius:31px!important;padding:30px 36px 35px!important;box-shadow:none!important;margin-bottom:28px!important}
+.hero h2{font-size:39px!important;line-height:1.05!important;margin:0 0 14px!important;letter-spacing:-1.2px!important}
+.hero p{font-size:21px!important;line-height:1.25!important;margin:0 0 28px!important;color:#b6b6bc!important}
+.search{height:91px!important;min-height:91px!important;border-radius:24px!important;background:#050505!important;border:1px solid #292929!important;padding:0 22px!important;gap:14px!important}
+.search>span{font-size:38px!important;color:#c8c8ce!important;line-height:1!important}
+.search input{font-size:23px!important;font-weight:600!important;padding:0!important}
+.search input::placeholder{color:#9d9da3!important}
+.search .searchClear{width:42px!important;height:42px!important;background:#77777b!important;color:#111!important;font-size:32px!important;font-weight:800!important;line-height:1!important}
+.grid{gap:18px!important}
+.card{min-height:268px!important;border-radius:29px!important;padding:29px 30px!important;background:linear-gradient(145deg,#0d0d0d,#050505)!important;border:1px solid #242424!important;box-shadow:none!important}
+.card .ico{font-size:57px!important;line-height:1!important;color:#ed1c24!important;filter:none!important}.card .ico svg{width:64px;height:64px;display:block}
+.card h3{font-size:30px!important;margin:28px 0 10px!important;letter-spacing:-.5px!important}
+.card p{font-size:20px!important;line-height:1.25!important;color:#a5a5ab!important}
+.searchResults,.searchResults *{font-family:inherit}
+.approvedTheme .search button,.approvedTheme .primary,.approvedTheme .searchAction{background:#d71920!important}
+.approvedTheme .searchFilter.active,.approvedTheme .searchTab.active{background:#d71920!important}
+.searchSectionTitle{color:#ed1c24!important}
+@media(max-width:600px){
+  .app{padding:20px 22px 85px!important}
+  .top{margin-bottom:31px!important}
+  .logo{width:90px!important;height:90px!important}
+  .brand h1{font-size:25px!important}
+  .brand p{font-size:15px!important}
+  .iconbtn{width:61px!important;height:61px!important}
+  .hero{padding:29px 37px 35px!important;border-radius:30px!important}
+  .hero h2{font-size:38px!important}
+  .hero p{font-size:20px!important}
+  .search{height:91px!important;min-height:91px!important}
+  .search input{font-size:22px!important}
+  .grid{gap:18px!important}
+  .card{min-height:268px!important;padding:29px 30px!important}
+  .card .ico{font-size:55px!important}
+  .card h3{font-size:29px!important}
+  .card p{font-size:19px!important}
+}
+
+
+/* ===== REFERENCIA EXACTA DE DIMENSIONES (iPhone de la captura) ===== */
+html,body{width:100%;min-width:0;background:#000!important}
+body{overflow-x:hidden}
+.app{width:100%;max-width:none;margin:0;padding:20px 22px 90px!important}
+.top{width:100%;height:90px;margin:0 0 31px!important}
+.brand{min-width:0;gap:14px}
+.logo{width:90px!important;height:90px!important;flex:0 0 90px!important;border-radius:18px!important}
+.brand>div:last-child{min-width:0}
+.brand h1{font-size:25px!important;white-space:nowrap!important;letter-spacing:-.55px!important}
+.brand p{font-size:15px!important;white-space:nowrap!important;margin-top:7px!important}
+.iconbtn{width:61px!important;height:61px!important;flex:0 0 61px!important;border-radius:18px!important}
+.hero{width:100%;min-height:344px!important;margin:0 0 30px!important;padding:39px 37px 35px!important;border-radius:30px!important}
+.hero h2{font-size:38px!important;margin:0 0 18px!important;white-space:nowrap!important}
+.hero p{font-size:20px!important;line-height:1.28!important;margin:0 0 30px!important;max-width:590px!important}
+.search{width:100%;height:91px!important;min-height:91px!important;padding:0 22px!important;border-radius:24px!important}
+.search>span{font-size:38px!important;flex:0 0 auto}
+.search input{font-size:22px!important;line-height:1!important}
+.search .searchClear{width:34px!important;height:34px!important;font-size:26px!important}
+#searchResults{width:100%}
+.grid{width:100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:20px!important}
+.card{width:100%;height:268px!important;min-height:268px!important;border-radius:29px!important;padding:29px 30px!important}
+.card .ico{height:64px!important;font-size:55px!important}
+.card .ico svg{width:64px!important;height:64px!important}
+.card h3{font-size:29px!important;margin:28px 0 10px!important}
+.card p{font-size:19px!important;line-height:1.25!important}
+@media(max-width:600px){
+ .app{padding:20px 22px 85px!important}
+ .top{height:90px!important;margin-bottom:31px!important}
+ .hero{min-height:344px!important;padding:39px 37px 35px!important;margin-bottom:30px!important}
+ .grid{gap:20px!important}
+ .card{height:268px!important}
+}
+
+
+/* RESPONSIVE FIX: match the supplied iPhone reference without horizontal overflow */
+html,body{width:100%;max-width:100%;overflow-x:hidden!important;background:#000!important}
+.app{width:100%!important;max-width:100%!important;margin:0!important;padding:12px 11px 60px!important}
+.top{width:100%!important;display:flex!important;gap:8px!important;margin-bottom:18px!important}
+.brand{min-width:0!important;flex:1 1 auto!important;gap:8px!important}
+.logo{width:45px!important;height:45px!important;min-width:45px!important;max-width:45px!important;border-radius:10px!important}
+.brand>div:last-child{min-width:0!important;flex:1!important}
+.brand h1{font-size:20px!important;line-height:1.05!important;white-space:nowrap!important;letter-spacing:-.5px!important}
+.brand p{font-size:12px!important;white-space:nowrap!important;margin-top:3px!important}
+.iconbtn{width:44px!important;height:44px!important;min-width:44px!important;border-radius:12px!important}
+.hero{width:100%!important;margin:0 0 15px!important;padding:19px 18px 18px!important;border-radius:22px!important}
+.hero h2{font-size:28px!important;line-height:1.05!important;margin:0 0 8px!important}
+.hero p{font-size:15px!important;line-height:1.25!important;margin:0 0 17px!important}
+.search{width:100%!important;min-height:46px!important;height:46px!important;border-radius:15px!important;padding:0 11px!important;gap:8px!important}
+.search>span{font-size:25px!important}
+.search input{font-size:16px!important;padding:0!important;min-width:0!important}
+.search .searchClear{width:25px!important;height:25px!important;font-size:20px!important}
+.grid{width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.card{width:100%!important;min-width:0!important;min-height:134px!important;height:134px!important;padding:15px!important;border-radius:17px!important}
+.card .ico{font-size:29px!important}
+.card .ico svg{width:32px!important;height:32px!important}
+.card h3{font-size:20px!important;line-height:1.05!important;margin:14px 0 6px!important}
+.card p{font-size:13px!important;line-height:1.25!important}
+@media(max-width:380px){
+ .brand h1{font-size:18px!important}
+ .brand p{font-size:11px!important}
+ .hero h2{font-size:26px!important}
+ .hero p{font-size:14px!important}
+ .card h3{font-size:19px!important}
+ .card p{font-size:12px!important}
+}
+
+
+/* ===== RESPONSIVE MOBILE GENERAL ===== */
+*{box-sizing:border-box}
+html,body{margin:0!important;padding:0!important;width:100%!important;min-width:0!important;overflow-x:hidden!important}
+body{background:#000!important}
+.app{
+  width:100%!important;
+  max-width:760px!important;
+  margin:0 auto!important;
+  padding:16px 16px 70px!important;
+}
+.top{
+  width:100%!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.brand{min-width:0!important;flex:1 1 auto!important}
+.brand>div:last-child{min-width:0!important;overflow:hidden!important}
+.brand h1{
+  font-size:clamp(18px,5.4vw,27px)!important;
+  line-height:1.05!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+.brand p{
+  font-size:clamp(11px,3.6vw,16px)!important;
+  white-space:normal!important;
+}
+.logo{flex:0 0 clamp(48px,13vw,90px)!important;width:clamp(48px,13vw,90px)!important;height:clamp(48px,13vw,90px)!important}
+.iconbtn{flex:0 0 clamp(46px,12vw,62px)!important;width:clamp(46px,12vw,62px)!important;height:clamp(46px,12vw,62px)!important}
+
+.hero{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  padding:clamp(20px,5vw,30px)!important;
+  border-radius:clamp(20px,5vw,31px)!important;
+}
+.hero h2{font-size:clamp(27px,7.5vw,39px)!important}
+.hero p{font-size:clamp(15px,4.2vw,21px)!important}
+.search{
+  width:100%!important;
+  min-width:0!important;
+  height:clamp(52px,14vw,91px)!important;
+  min-height:clamp(52px,14vw,91px)!important;
+}
+.search input{
+  min-width:0!important;
+  width:100%!important;
+  font-size:clamp(15px,4.2vw,23px)!important;
+}
+.search input::placeholder{white-space:nowrap!important;text-overflow:ellipsis!important;overflow:hidden!important}
+.grid{
+  width:100%!important;
+  max-width:none!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:clamp(10px,3vw,18px)!important;
+}
+.card{
+  width:100%!important;
+  min-width:0!important;
+  min-height:clamp(145px,38vw,268px)!important;
+  height:auto!important;
+  padding:clamp(16px,4vw,30px)!important;
+  border-radius:clamp(16px,4vw,29px)!important;
+}
+.card .ico{font-size:clamp(30px,8vw,57px)!important}
+.card .ico svg{width:clamp(34px,9vw,64px)!important;height:clamp(34px,9vw,64px)!important}
+.card h3{font-size:clamp(20px,5.8vw,30px)!important;margin:clamp(12px,4vw,28px) 0 7px!important}
+.card p{font-size:clamp(13px,3.8vw,20px)!important;line-height:1.25!important}
+
+/* Form and detail screens also adapt to any phone/tablet width */
+.panel,.item,.field,input,select,textarea,button{max-width:100%!important}
+.panel{min-width:0!important}
+.item main{min-width:0!important;overflow-wrap:anywhere!important}
+input,select,textarea{font-size:16px!important}
+img{max-width:100%}
+
+/* Small Android phones and narrow screens */
+@media(max-width:390px){
+  .app{padding-left:12px!important;padding-right:12px!important}
+  .top{gap:8px!important}
+  .hero{padding:18px!important}
+  .grid{gap:9px!important}
+  .card{padding:14px!important}
+  .card h3{font-size:20px!important}
+  .card p{font-size:13px!important}
+}
+
+/* Larger phones / small tablets */
+@media(min-width:600px){
+  .app{padding-left:24px!important;padding-right:24px!important}
+  .grid{gap:18px!important}
+}
+
+/* Never allow any child to create horizontal overflow */
+.app *{max-width:100%}
+
+
+/* ===== HOME MOBILE: SIN PANEL PRINCIPAL ===== */
+#home > .hero{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  padding:0!important;
+  margin:0 0 18px!important;
+}
+#home > .hero .search{
+  width:100%!important;
+  min-height:58px!important;
+  height:auto!important;
+  margin:0!important;
+  border-radius:18px!important;
+}
+#home > .hero .search input{
+  font-size:clamp(15px,4.2vw,23px)!important;
+}
+#home > .grid{
+  margin-top:0!important;
+}
+#home > .grid .card{
+  position:relative!important;
+  padding-right:52px!important;
+}
+#home > .grid .card::after{
+  content:"›";
+  position:absolute;
+  right:20px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#d7d9df;
+  font-size:32px;
+  line-height:1;
+  font-weight:400;
+}
+@media(max-width:390px){
+  #home > .hero{margin-bottom:14px!important}
+  #home > .grid .card{padding-right:44px!important}
+  #home > .grid .card::after{right:14px;font-size:28px}
+}
+
+
+/* ===== AJUSTE FINAL: CONTENIDO PRINCIPAL MÁS ARRIBA ===== */
+#home > .hero{
+  min-height:0!important;
+  height:auto!important;
+  margin:0 0 14px!important;
+  padding:0!important;
+}
+#home > .hero .search{
+  min-height:58px!important;
+  height:58px!important;
+}
+#home > .grid{
+  margin-top:0!important;
+  gap:14px!important;
+}
+#home > .grid .card{
+  min-height:150px!important;
+}
+
+
+/* ===== FICHA DE PERSONA: DISEÑO DETALLADO ===== */
+.detail-hero{display:flex;gap:16px;align-items:center;padding:4px 0 8px}
+.detail-profile-photo{width:128px;height:128px;flex:0 0 128px;border-radius:18px;overflow:hidden;background:#111;border:1px solid #26344f}
+.detail-profile-photo button{display:block;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer}
+.detail-profile-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.detail-profile-photo>div{height:100%;display:grid;place-items:center;font-size:62px}
+.detail-profile-info{min-width:0;flex:1}
+.detail-profile-info h2{margin:0 0 7px;font-size:clamp(25px,7vw,38px);line-height:1.05}
+.detail-profile-info p{margin:5px 0;color:#aeb5c4;font-size:16px}
+.detail-address{display:flex!important;gap:8px;align-items:flex-start;color:#d8dce4!important;line-height:1.3}
+.detail-address>span:first-child{font-size:22px}
+.detail-actions{display:flex;gap:10px;margin:10px 0 6px}
+.detail-actions button{flex:1;min-height:48px;border:1px solid #26344f;border-radius:15px;background:#0d1118;color:#f2f4f8;font-weight:800;font-size:16px}
+.detail-actions button.danger{border-color:#7f2025;color:#ff4b52}
+.detail-section{margin-top:18px}
+.detail-section h3{display:flex;align-items:center;gap:9px;margin:0 0 10px;font-size:19px}
+.detail-section h3 span{color:#ff1d25}
+.detail-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.detail-photo{padding:0;border:1px solid #26344f;border-radius:13px;overflow:hidden;background:#10151e;aspect-ratio:1;cursor:pointer}
+.detail-photo img{width:100%;height:100%;display:block;object-fit:cover}
+.detail-empty{border:1px dashed #26344f;border-radius:13px;padding:14px;color:#8e97a8;background:#090c12}
+.detail-vehicle{display:flex;align-items:center;gap:11px;padding:9px;border:1px solid #26344f;border-radius:15px;background:#080b10}
+.detail-vehicle-photo{width:116px;height:88px;flex:0 0 116px;padding:0;border:0;border-radius:11px;overflow:hidden;background:#151b25;cursor:pointer}
+.detail-vehicle-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.vehicle-placeholder{display:grid;place-items:center;font-size:38px}
+.detail-vehicle-info{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.detail-vehicle-info strong{font-size:18px;overflow-wrap:anywhere}
+.detail-vehicle-info span{font-size:14px;color:#aeb5c4;overflow-wrap:anywhere}
+.detail-arrow{border:0;background:none;color:#dce0e8;font-size:34px;padding:6px;cursor:pointer}
+.detail-vehicle-thumbs{display:flex;gap:7px;margin:8px 0 0 125px;overflow:auto}
+.detail-vehicle-thumbs button{padding:0;border:0;border-radius:9px;overflow:hidden;background:#111;width:60px;height:60px;flex:0 0 60px}
+.detail-vehicle-thumbs img{width:100%;height:100%;object-fit:cover}
+.detail-group-row{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #26344f;border-radius:13px;background:#080b10;margin-top:7px}
+.detail-group-row>span{font-size:24px}
+.detail-group-row>div{min-width:0;flex:1}
+.detail-group-row strong,.detail-group-row small{display:block}
+.detail-group-row small{color:#aeb5c4;margin-top:3px}
+.detail-group-row button{border:1px solid #26344f;border-radius:10px;background:#111823;color:#fff;padding:8px 10px;font-weight:700}
+.detail-notes{border:1px solid #26344f;border-radius:13px;background:#080b10;padding:13px;color:#c4c9d3;white-space:pre-wrap;line-height:1.45}
+.photo-viewer{text-align:center;background:#000;border-radius:15px;padding:4px}
+.photo-viewer img{display:block;width:100%;max-height:72vh;object-fit:contain;border-radius:12px}
+@media(max-width:520px){
+ .detail-hero{gap:12px}.detail-profile-photo{width:100px;height:100px;flex-basis:100px}.detail-profile-info h2{font-size:27px}
+ .detail-gallery{grid-template-columns:repeat(3,minmax(0,1fr))}.detail-vehicle-photo{width:96px;height:78px;flex-basis:96px}.detail-vehicle-thumbs{margin-left:103px}
+}
+
+
+/* ===== FICHA DE PERSONA — DISEÑO APROBADO ===== */
+.modal.personDetailModal .sheet{}
+.person-detail-modal .sheet,
+.modal:has(.detail-hero) .sheet{
+  width:min(760px,100%)!important;
+  max-width:760px!important;
+  max-height:94vh!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  background:#101827!important;
+  border:1px solid #26344f!important;
+  border-radius:28px 28px 0 0!important;
+  padding:24px 20px 28px!important;
+}
+.modal:has(.detail-hero) .sheetHead{
+  position:sticky!important;
+  top:0!important;
+  z-index:3!important;
+  background:#101827!important;
+  padding:2px 0 16px!important;
+  margin:-2px 0 14px!important;
+}
+.modal:has(.detail-hero) .sheetHead b{
+  font-size:25px!important;
+  font-weight:800!important;
+}
+.modal:has(.detail-hero) .close{
+  width:54px!important;
+  height:54px!important;
+  border-radius:17px!important;
+  font-size:25px!important;
+  background:#172033!important;
+  border:1px solid #26344f!important;
+}
+.detail-hero{
+  display:flex!important;
+  align-items:center!important;
+  gap:18px!important;
+  padding:4px 0 12px!important;
+}
+.detail-profile-photo{
+  width:142px!important;
+  height:142px!important;
+  flex:0 0 142px!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+  background:#050505!important;
+  border:1px solid #26344f!important;
+}
+.detail-profile-photo button,
+.detail-profile-photo img{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  border:0!important;
+  padding:0!important;
+  background:none!important;
+  object-fit:cover!important;
+}
+.detail-profile-info{min-width:0!important}
+.detail-profile-info h2{
+  font-size:30px!important;
+  margin:0 0 8px!important;
+  font-weight:850!important;
+}
+.detail-profile-info p{
+  margin:5px 0!important;
+  font-size:18px!important;
+  color:#f3f4f7!important;
+}
+.detail-address{
+  display:flex!important;
+  gap:8px!important;
+  align-items:flex-start!important;
+  line-height:1.3!important;
+}
+.detail-actions{
+  display:flex!important;
+  gap:10px!important;
+  margin:10px 0 18px!important;
+}
+.detail-actions button{
+  flex:1!important;
+  min-height:50px!important;
+  border-radius:15px!important;
+  font-size:17px!important;
+  font-weight:750!important;
+}
+.detail-actions .danger{
+  background:#100b0c!important;
+  color:#ff3038!important;
+  border-color:#8e1c23!important;
+}
+.detail-section{
+  margin-top:18px!important;
+  padding:0!important;
+}
+.detail-section h3{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:0 0 12px!important;
+  font-size:20px!important;
+  font-weight:850!important;
+}
+.detail-section h3 span{font-size:24px!important}
+.detail-gallery{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.detail-photo{
+  padding:0!important;
+  aspect-ratio:1/1!important;
+  overflow:hidden!important;
+  border-radius:14px!important;
+  border:1px solid #26344f!important;
+  background:#080b10!important;
+}
+.detail-photo img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  display:block!important;
+}
+.detail-empty{
+  border:1px dashed #26344f!important;
+  border-radius:16px!important;
+  background:#050505!important;
+  padding:28px 18px!important;
+  text-align:center!important;
+  color:#aeb6c5!important;
+  font-size:17px!important;
+}
+.detail-vehicle{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  padding:10px!important;
+  border:1px solid #26344f!important;
+  border-radius:16px!important;
+  background:#080b10!important;
+  min-width:0!important;
+}
+.detail-vehicle-photo{
+  width:120px!important;
+  height:92px!important;
+  flex:0 0 120px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:12px!important;
+  border:0!important;
+  background:#111827!important;
+}
+.detail-vehicle-photo img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  display:block!important;
+}
+.detail-vehicle-info{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:4px!important;
+  min-width:0!important;
+  flex:1!important;
+}
+.detail-vehicle-info strong{font-size:18px!important}
+.detail-vehicle-info span{font-size:14px!important;color:#aeb6c5!important}
+.detail-arrow{
+  font-size:32px!important;
+  padding:6px 8px!important;
+  color:#e9edf3!important;
+  background:none!important;
+  border:0!important;
+}
+.detail-vehicle-thumbs{
+  display:flex!important;
+  gap:8px!important;
+  margin:8px 0 0 132px!important;
+  flex-wrap:wrap!important;
+}
+.detail-vehicle-thumbs button{
+  width:62px!important;
+  height:62px!important;
+  padding:0!important;
+  border:1px solid #26344f!important;
+  border-radius:10px!important;
+  overflow:hidden!important;
+}
+.detail-vehicle-thumbs img{
+  width:100%!important;height:100%!important;object-fit:cover!important;
+}
+.detail-group-row{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:12px!important;
+  border:1px solid #26344f!important;
+  border-radius:14px!important;
+  background:#080b10!important;
+}
+.detail-group-row>span{font-size:25px!important}
+.detail-group-row>div{flex:1!important;min-width:0!important}
+.detail-group-row strong,.detail-group-row small{display:block!important}
+.detail-group-row small{color:#aeb6c5!important;margin-top:3px!important}
+.detail-group-row button{
+  border:1px solid #26344f!important;
+  border-radius:10px!important;
+  padding:8px 10px!important;
+}
+.detail-notes{
+  border:1px solid #26344f!important;
+  border-radius:15px!important;
+  background:#080b10!important;
+  padding:14px!important;
+  color:#c4c9d3!important;
+  white-space:pre-wrap!important;
+  line-height:1.45!important;
+}
+@media(max-width:600px){
+  .modal:has(.detail-hero){align-items:flex-end!important}
+  .modal:has(.detail-hero) .sheet{
+    width:100%!important;
+    max-height:94vh!important;
+    padding:20px 16px 26px!important;
+    border-radius:26px 26px 0 0!important;
+  }
+  .modal:has(.detail-hero) .sheetHead b{font-size:24px!important}
+  .detail-hero{gap:13px!important}
+  .detail-profile-photo{width:112px!important;height:112px!important;flex-basis:112px!important}
+  .detail-profile-info h2{font-size:26px!important}
+  .detail-profile-info p{font-size:16px!important}
+  .detail-gallery{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .detail-vehicle-photo{width:100px!important;height:82px!important;flex-basis:100px!important}
+  .detail-vehicle-thumbs{margin-left:112px!important}
+}
+
+</style>
+</head>
+<body class="approvedTheme">
+<div class="app">
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-label="Calavera">☠</div>
+    <div>
+      <h1>Sistema <span class="red">IN OMNIA PARATUS</span></h1>
+      <p>Personas · Vehículos · Grupos · Red</p>
+    </div>
+  </div>
+  <button class="iconbtn" onclick="goHome()">⌂</button>
+</header>
+
+<section id="home" class="view active">
+  <div class="hero">
+    <div class="search" id="searchBox">
+      <span style="font-size:23px">⌕</span>
+      <input id="globalSearch" placeholder="Buscar nombre, cédula, placa o grupo">
+      <button type="button" id="searchClear" class="searchClear" aria-label="Limpiar búsqueda">×</button>
+    </div>
+  </div>
+  <div id="searchResults" style="margin:0 0 16px"></div>
+  <div class="grid">
+    <button class="card" onclick="openView('people')"><div class="ico"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="18" r="11" fill="#ed1c24"/><path d="M12 55c2-13 10-20 20-20s18 7 20 20H12z" fill="#ed1c24"/></svg></div><h3>Personas</h3><p>Registrar y consultar fichas.</p></button>
+    <button class="card" onclick="openView('vehicles')"><div class="ico"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 39l6-18c1-3 3-5 6-5h12c3 0 5 2 6 5l6 18v11H14V39z" fill="#ed1c24"/><rect x="20" y="23" width="24" height="10" rx="2" fill="#050505"/><circle cx="22" cy="50" r="5" fill="#050505"/><circle cx="42" cy="50" r="5" fill="#050505"/></svg></div><h3>Vehículos</h3><p>Registrar vehículos y propietarios.</p></button>
+    <button class="card" onclick="openView('groups')"><div class="ico"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="23" cy="20" r="8" fill="#ed1c24"/><circle cx="41" cy="20" r="8" fill="#ed1c24"/><path d="M8 48c1-10 7-16 15-16s14 6 15 16H8zM26 48c1-9 6-15 15-15s14 6 15 15H26z" fill="#ed1c24"/></svg></div><h3>Grupos</h3><p>Crear grupos y generar la red.</p></button>
+    <button class="card" onclick="openView('network')"><div class="ico"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="15" r="8" fill="#ed1c24"/><circle cx="15" cy="49" r="8" fill="#ed1c24"/><circle cx="49" cy="49" r="8" fill="#ed1c24"/><circle cx="32" cy="49" r="8" fill="#ed1c24"/><path d="M32 23v14M15 41V34h34v7M32 34v7" stroke="#ed1c24" stroke-width="4" fill="none"/></svg></div><h3>Red</h3><p>Editar la estructura jerárquica.</p></button>
+  </div>
+</section>
+
+<section id="people" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">👤 Personas</h2><p class="subtitle">Registra la ficha de cada persona.</p>
+<div class="panel">
+<div class="photoBox"><div class="avatar" id="personAvatar">👤</div><div class="photoBtns">
+<label>📷 Cámara<input id="camera" type="file" accept="image/*" capture="environment" onchange="setProfile(this)"></label>
+<label>🖼️ Galería<input id="gallery" type="file" accept="image/*" onchange="setProfile(this)"></label>
+</div></div>
+<div class="field"><label>Nombre completo *</label><input id="pName"></div>
+<div class="field"><label>Identificación / cédula</label><input id="pId"></div>
+<div class="field"><label>Ubicación / dirección</label><input id="pLocation"></div>
+<div class="field"><label>Fotos adicionales de la persona</label><input type="file" id="pPhotos" accept="image/*" multiple onchange="previewPhotos(this,'pThumbs')"><div id="pThumbs" class="thumbs"></div></div>
+<div class="field"><label>Fotos de la casa / ubicación</label><input type="file" id="housePhotos" accept="image/*" multiple onchange="previewPhotos(this,'hThumbs')"><div id="hThumbs" class="thumbs"></div></div>
+<div class="field"><label>Notas</label><textarea id="pNotes"></textarea></div>
+<button class="primary" onclick="savePerson()">💾 Guardar persona</button>
+</div>
+<div id="peopleList" class="list"></div>
+</section>
+
+<section id="vehicles" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">🚗 Vehículos</h2><p class="subtitle">Registra vehículos y relaciónalos con una persona.</p>
+<div class="panel">
+<div class="row"><div class="field"><label>Marca</label><input id="vMake"></div><div class="field"><label>Modelo</label><input id="vModel"></div></div>
+<div class="row"><div class="field"><label>Año</label><input id="vYear" type="number"></div><div class="field"><label>Placa</label><input id="vPlate"></div></div>
+<div class="field"><label>Propietario</label><select id="vOwner"><option value="">Sin propietario</option></select></div>
+<div class="field"><label>Fotos</label><input type="file" id="vPhotos" accept="image/*" multiple onchange="previewPhotos(this,'vThumbs')"><div id="vThumbs" class="thumbs"></div></div>
+<div class="field"><label>Notas</label><textarea id="vNotes"></textarea></div>
+<button class="primary" onclick="saveVehicle()">💾 Guardar vehículo</button>
+<p style="color:#98a2b3;font-size:12px;margin:10px 0 0;text-align:center">Después de guardarlo, toca el vehículo para abrir su ficha completa.</p>
+</div><div id="vehicleList" class="list"></div>
+</section>
+
+<section id="groups" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">👥 Grupos</h2><p class="subtitle">Elige un líder y agrega los integrantes. La red se genera automáticamente.</p>
+<div class="panel">
+<div class="field"><label>Nombre del grupo *</label><input id="gName" placeholder="Ej. Zona Norte"></div>
+<div class="field"><label>Principal líder *</label><select id="gLeader"></select></div>
+<div class="field"><label>Personas del grupo</label><div id="memberChecks" class="checklist"></div></div>
+<button class="primary" onclick="saveGroup()">💾 Crear grupo y generar red</button>
+</div><div id="groupList" class="list"></div>
+</section>
+
+<section id="network" class="view">
+<button class="back" onclick="goHome()">← Principal</button><h2 class="title">☠️ Redes</h2><p class="subtitle">Cada grupo tiene su propia red. Puedes cambiar entre ellas sin mezclar sus integrantes.</p>
+<div class="panel">
+<div class="field"><label>Red / grupo que estás viendo</label><select id="networkSelector" onchange="switchNetwork(this.value)"></select></div>
+</div>
+<div class="tools"><button class="secondary" onclick="addNode()">＋ Agregar debajo</button><button class="secondary" onclick="editRole()">✏️ Editar cargo</button><button class="secondary" onclick="chooseLeader()">⭐ Elegir líder</button></div>
+<div id="selectedInfo" class="panel" style="padding:13px">Selecciona una persona en la red para editarla.</div>
+<div id="tree" class="tree"></div>
+</section>
+</div>
+
+<div id="modal" class="modal"><div class="sheet"><div class="sheetHead"><b id="modalTitle">Editar</b><button class="close" onclick="closeModal()">✕</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const KEY='sistemaGestionV1';
+const EMPTY_DB=()=>({people:[],vehicles:[],groups:[],networks:[]});
+let db=EMPTY_DB();
+try{
+  const cached=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(cached && typeof cached==='object') db=cached;
+}catch(e){ console.warn('No se pudo leer localStorage',e); }
+if(!Array.isArray(db.people)) db.people=[];
+if(!Array.isArray(db.vehicles)) db.vehicles=[];
+if(!Array.isArray(db.groups)) db.groups=[];
+if(!Array.isArray(db.networks)) db.networks=[];
+function makeId(){
+  try{ if(window.crypto?.randomUUID) return crypto.randomUUID(); }catch(e){}
+  return 'id-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+}
+/* Compatibilidad con la versión anterior: convierte la red única en la red del primer grupo. */
+if(db.network && !db.networks.length){
+  if(db.groups.length && db.network.leaderId){
+    db.networks.push({groupId:db.groups[0].id,leaderId:db.network.leaderId,links:db.network.links||[]});
+  }
+  delete db.network;
+}
+let profileData='', personPhotos=[], housePhotos=[], vehiclePhotos=[], selectedNode=null, currentNetworkGroupId=null;
+
+/* ===== ALMACENAMIENTO ROBUSTO =====
+   localStorage tiene un límite pequeño y puede fallar cuando hay fotos.
+   Usamos IndexedDB como almacenamiento principal de respaldo para que
+   las fichas con imágenes sí puedan guardarse en el móvil. */
+const IDB_NAME='sistemaPersonasDB';
+const IDB_STORE='datos';
+const IDB_VERSION=2;
+
+function openAppDB(){
+  return new Promise((resolve,reject)=>{
+    if(!('indexedDB' in window)){reject(new Error('IndexedDB no disponible'));return}
+    const req=indexedDB.open(IDB_NAME,IDB_VERSION);
+    req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(IDB_STORE))req.result.createObjectStore(IDB_STORE)};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('No se pudo abrir el almacenamiento'));
+  });
+}
+async function idbGet(){
+  const dbx=await openAppDB();
+  return new Promise((resolve,reject)=>{
+    const tx=dbx.transaction(IDB_STORE,'readonly');
+    const req=tx.objectStore(IDB_STORE).get('main');
+    req.onsuccess=()=>{dbx.close();resolve(req.result||null)};
+    req.onerror=()=>{dbx.close();reject(req.error||new Error('No se pudo leer la base de datos'))};
+  });
+}
+async function idbPut(value){
+  const dbx=await openAppDB();
+  return new Promise((resolve,reject)=>{
+    let settled=false;
+    const finish=(ok,err)=>{if(settled)return;settled=true;try{dbx.close()}catch(_){};ok?resolve(true):reject(err||new Error('No se pudo guardar la base de datos'))};
+    let tx;
+    try{tx=dbx.transaction(IDB_STORE,'readwrite')}catch(e){finish(false,e);return}
+    const req=tx.objectStore(IDB_STORE).put(value,'main');
+    req.onerror=()=>finish(false,req.error||new Error('Error al escribir los datos'));
+    tx.oncomplete=()=>finish(true);
+    tx.onerror=()=>finish(false,tx.error||new Error('Error en la transacción'));
+    tx.onabort=()=>finish(false,tx.error||new Error('Transacción cancelada'));
+  });
+}
+async function saveDB(){
+  try{
+    // IndexedDB es el almacenamiento principal: admite fichas con muchas fotos.
+    await idbPut(db);
+    // Mantener una copia ligera/compatible si el navegador todavía tiene espacio.
+    try{ localStorage.setItem(KEY,JSON.stringify(db)); }catch(e){ console.warn('Copia local no disponible; IndexedDB sí quedó guardada',e); }
+    return true;
+  }catch(e){
+    console.error('IndexedDB no pudo guardar:',e);
+    // Último respaldo: localStorage.
+    try{
+      localStorage.setItem(KEY,JSON.stringify(db));
+      return true;
+    }catch(e2){
+      console.error('Tampoco se pudo guardar en localStorage:',e2);
+      toast('⚠️ Chrome no permitió guardar los datos. Revisa el almacenamiento del sitio.');
+      return false;
+    }
+  }
+}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),2400)}
+function openView(id){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='network'&&!currentNetworkGroupId&&db.groups.length)currentNetworkGroupId=db.groups[0].id;renderAll();scrollTo(0,0)}
+function goHome(){openView('home')}
+
+/* Comprime las fotos antes de guardarlas. Esto evita superar el límite de almacenamiento
+   del navegador (localStorage) cuando se cargan fotos tomadas con la cámara del móvil. */
+function compressImage(file,maxSize=1000,quality=.72){
+  return new Promise((resolve,reject)=>{
+    if(!file){resolve('');return}
+    const reader=new FileReader();
+    reader.onerror=()=>reject(reader.error||new Error('No se pudo leer la foto'));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const scale=Math.min(1,maxSize/Math.max(img.naturalWidth,img.naturalHeight));
+        const w=Math.max(1,Math.round(img.naturalWidth*scale));
+        const h=Math.max(1,Math.round(img.naturalHeight*scale));
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d',{alpha:false});
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=()=>reject(new Error('No se pudo procesar la foto'));
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function setProfile(input){
+  const f=input.files[0]; if(!f)return;
+  try{
+    profileData=await compressImage(f,700,.76);
+    document.getElementById('personAvatar').innerHTML='<img src="'+profileData+'">';
+  }catch(e){toast('⚠️ No se pudo cargar la foto de perfil')}
+}
+async function previewPhotos(input,target){
+  const arr=target==='pThumbs'?personPhotos:target==='hThumbs'?housePhotos:vehiclePhotos;
+  for(const f of Array.from(input.files)){
+    try{
+      const data=await compressImage(f,1000,.72);
+      arr.push(data);
+      renderThumbs(target,arr);
+    }catch(e){toast('⚠️ No se pudo cargar una de las fotos')}
+  }
+}
+function renderThumbs(id,arr){document.getElementById(id).innerHTML=arr.map(x=>'<img src="'+x+'">').join('')}
+function resetPerson(){profileData='';personPhotos=[];housePhotos=[];document.getElementById('personAvatar').innerHTML='👤';['pName','pId','pLocation','pNotes'].forEach(x=>document.getElementById(x).value='');document.getElementById('pThumbs').innerHTML='';document.getElementById('hThumbs').innerHTML='';}
+async function savePerson(){
+  const name=document.getElementById('pName').value.trim();
+  if(!name){toast('Escribe el nombre');return}
+  const btn=document.querySelector('#people .primary');
+  if(btn){btn.disabled=true;btn.textContent='💾 Guardando...'}
+  const person={
+    id:makeId(),
+    name,
+    cedula:document.getElementById('pId').value.trim(),
+    location:document.getElementById('pLocation').value.trim(),
+    profile:profileData||'',
+    photos:[...personPhotos],
+    housePhotos:[...housePhotos],
+    notes:document.getElementById('pNotes').value.trim(),
+    created:Date.now()
+  };
+  db.people.push(person);
+  try{
+    const ok=await saveDB();
+    if(!ok) throw new Error('El navegador no permitió completar el almacenamiento');
+  }catch(e){
+    db.people.pop();
+    console.error('ERROR GUARDANDO PERSONA',e);
+    toast('⚠️ Error al guardar: '+(e?.message||e));
+    if(btn){btn.disabled=false;btn.textContent='💾 Guardar persona'}
+    return;
+  }
+  // El guardado ya terminó. Si la interfaz falla al redibujar, no debe
+  // confundirse con un fallo de almacenamiento.
+  try{
+    resetPerson();
+    renderAll();
+    toast('✅ Persona guardada con sus fotos e información');
+  }catch(e){
+    console.error('Persona guardada; error actualizando pantalla',e);
+    toast('✅ Persona guardada. Recarga la página para verla.');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='💾 Guardar persona'}
+  }
+}
+
+function saveVehicle(){if(!vMake.value.trim()&&!vModel.value.trim()&&!vPlate.value.trim()){toast('Completa al menos marca, modelo o placa');return}db.vehicles.push({id:crypto.randomUUID(),make:vMake.value.trim(),model:vModel.value.trim(),year:vYear.value,plate:vPlate.value.trim(),owner:vOwner.value,photos:[...vehiclePhotos],notes:vNotes.value.trim()});saveDB();['vMake','vModel','vYear','vPlate','vNotes'].forEach(x=>document.getElementById(x).value='');vehiclePhotos=[];vThumbs.innerHTML='';renderAll();toast('Vehículo guardado');}
+function saveGroup(){
+  const name=document.getElementById('gName').value.trim();
+  const leader=document.getElementById('gLeader').value;
+  const members=[...document.querySelectorAll('#memberChecks input:checked')].map(x=>x.value);
+  if(!name){toast('Escribe el nombre del grupo');return}
+  if(!leader){toast('Selecciona el principal líder');return}
+  if(!members.includes(leader))members.push(leader);
+
+  const groupId=crypto.randomUUID();
+  const group={id:groupId,name,leader,members};
+  const links=members.filter(id=>id!==leader).map(id=>({
+    parent:leader,child:id,role:'Integrante'
+  }));
+
+  db.groups.push(group);
+  db.networks.push({
+    groupId:groupId,
+    leaderId:leader,
+    links:links
+  });
+
+  currentNetworkGroupId=groupId;
+  selectedNode=null;
+  document.getElementById('gName').value='';
+  saveDB();
+  renderAll();
+  openView('network');
+  toast('✅ Grupo creado: red generada automáticamente');
+}
+
+function renderPeople(){peopleList.innerHTML=db.people.length?db.people.map(p=>`<div class="item"><div class="mini">${p.profile?`<img class="mini" src="${p.profile}">`:'👤'}</div><main><strong>${esc(p.name)}</strong><small>${esc(p.cedula||'Sin cédula')} · ${esc(p.location||'Sin ubicación')}</small></main><button onclick="showPerson('${p.id}')">Ver</button></div>`).join(''):'<div class="empty">No hay personas registradas.</div>';vOwner.innerHTML='<option value="">Sin propietario</option>'+db.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');gLeader.innerHTML=db.people.length?db.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join(''):'<option value="">Primero registra personas</option>';memberChecks.innerHTML=db.people.map(p=>`<label class="check"><input type="checkbox" value="${p.id}"> ${esc(p.name)}</label>`).join('')||'<div class="empty">Primero registra personas.</div>'}
+function renderVehicles(){
+  vehicleList.innerHTML=db.vehicles.length?db.vehicles.map(v=>{
+    let o=db.people.find(p=>p.id===v.owner);
+    let photo=v.photos?.[0];
+    return `<div class="item">
+      <div class="mini">${photo?`<img class="mini" src="${photo}" style="object-fit:cover">`:'🚗'}</div>
+      <main><strong>${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</strong>
+      <small>Placa: ${esc(v.plate||'Sin placa')} · Propietario: ${esc(o?.name||'Sin propietario')}</small></main>
+      <button onclick="showVehicle('${v.id}')">👁️ Ver</button>
+      <button onclick="deleteVehicle('${v.id}')">🗑️</button>
+    </div>`
+  }).join(''):'<div class="empty">No hay vehículos registrados.</div>'
+}
+function showVehicle(id){
+  const v=db.vehicles.find(x=>x.id===id); if(!v)return;
+  const owner=db.people.find(p=>p.id===v.owner);
+  const photos=v.photos||[];
+  const mainPhoto=photos[0];
+  const ownerGroups=owner?db.groups.filter(g=>g.members.includes(owner.id)).map(g=>{
+    const net=db.networks.find(n=>n.groupId===g.id);
+    const link=net?.links.find(l=>l.child===owner.id);
+    const role=owner.id===g.leader?'Principal líder':(link?.role||'Integrante');
+    return `<p><b>👥 Grupo:</b> ${esc(g.name)}<br><b>🏷️ Cargo:</b> ${esc(role)}</p>`;
+  }).join(''):'';
+  openModal('Ficha del vehículo',`
+    ${mainPhoto?`<img src="${mainPhoto}" style="width:100%;max-height:280px;object-fit:cover;border-radius:18px;margin-bottom:15px">`:`<div style="height:180px;border-radius:18px;background:#1b2638;display:grid;place-items:center;font-size:55px;margin-bottom:15px">🚗</div>`}
+    <div class="panel" style="margin:0 0 14px">
+      <h3 style="margin:0 0 12px">${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</h3>
+      <p><b>👤 De quién es:</b> ${esc(owner?.name||'Sin propietario')}</p>
+      ${owner?.location?`<p><b>📍 Dónde se maneja / ubicación:</b> ${esc(owner.location)}</p>`:''}
+      <p><b>🔢 Placa:</b> ${esc(v.plate||'Sin placa')}</p>
+      <p><b>📅 Año:</b> ${esc(v.year||'No indicado')}</p>
+      <p><b>🏷️ Marca:</b> ${esc(v.make||'No indicada')}</p>
+      <p><b>🚗 Modelo:</b> ${esc(v.model||'No indicado')}</p>
+      ${ownerGroups||'<p><b>👥 Grupo:</b> Sin grupo asignado</p>'}
+      <p><b>📝 Características / notas:</b><br>${esc(v.notes||'Sin notas')}</p>
+    </div>
+    ${photos.length>1?`<div><b>📷 Fotos del vehículo</b><div class="thumbs">${photos.map(x=>`<img src="${x}" style="width:90px;height:90px">`).join('')}</div></div>`:''}
+    <button class="primary" style="margin-top:16px" onclick="deleteVehicleFromDetail('${v.id}')">🗑️ Eliminar vehículo</button>
+  `);
+}
+
+function deleteVehicleFromDetail(id){
+  if(!confirm('¿Eliminar vehículo?'))return;
+  db.vehicles=db.vehicles.filter(v=>v.id!==id);
+  saveDB();closeModal();renderAll();toast('Vehículo eliminado');
+}
+function renderGroups(){groupList.innerHTML=db.groups.length?db.groups.map(g=>{let l=db.people.find(p=>p.id===g.leader);return `<div class="item"><div class="mini">👥</div><main><strong>${esc(g.name)}</strong><small>Líder: ${esc(l?.name||'—')} · ${g.members.length} personas</small></main><button onclick="viewNetwork('${g.id}')">☠️ Red</button><button onclick="editGroup('${g.id}')">✏️ Editar</button></div>`}).join(''):'<div class="empty">No hay grupos creados.</div>'}
+function viewNetwork(groupId){currentNetworkGroupId=groupId;selectedNode=null;openView('network')}
+function editGroup(groupId){
+  const g=db.groups.find(x=>x.id===groupId); if(!g)return;
+  const leader=db.people.find(p=>p.id===g.leader);
+  openModal('Editar grupo',`
+    <div class="field"><label>Nombre del grupo</label><input id="editGroupName" value="${esc(g.name)}"></div>
+    <div class="field"><label>Principal líder</label><input value="${esc(leader?.name||'—')}" disabled></div>
+    <div class="field"><label>Integrantes guardados</label>
+      <div class="checklist">${db.people.map(p=>`
+        <label class="check">
+          <input type="checkbox" class="editMember" value="${p.id}" ${g.members.includes(p.id)?'checked':''} ${p.id===g.leader?'disabled':''}>
+          ${p.profile?`<img src="${p.profile}" style="width:34px;height:34px;border-radius:50%;object-fit:cover">`:'👤'}
+          <span>${esc(p.name)}</span>
+          ${p.id===g.leader?'<small style="margin-left:auto;color:#8fb4ff">LÍDER</small>':''}
+        </label>`).join('')}
+      </div>
+    </div>
+    <button class="primary" onclick="saveGroupEdit('${g.id}')">💾 Guardar cambios</button>
+  `);
+}
+function saveGroupEdit(groupId){
+  const g=db.groups.find(x=>x.id===groupId); if(!g)return;
+  const name=editGroupName.value.trim(); if(!name){toast('Escribe un nombre para el grupo');return}
+  const selected=[...document.querySelectorAll('.editMember:checked')].map(x=>x.value);
+  if(!selected.includes(g.leader))selected.push(g.leader);
+  const oldMembers=[...g.members];
+  g.name=name; g.members=selected;
+  let net=getNetwork(groupId);
+  if(!net){net={groupId,leaderId:g.leader,links:[]};db.networks.push(net)}
+  const oldLinks=net.links;
+  selected.filter(id=>id!==g.leader).forEach(id=>{
+    if(!net.links.some(l=>l.child===id)) net.links.push({parent:g.leader,child:id,role:'Integrante'});
+  });
+  oldMembers.filter(id=>!selected.includes(id)&&id!==g.leader).forEach(id=>{
+    net.links=net.links.filter(l=>l.child!==id);
+  });
+  currentNetworkGroupId=groupId;selectedNode=null;saveDB();closeModal();renderAll();toast('Grupo actualizado');
+}
+function getNetwork(groupId=currentNetworkGroupId){
+  return db.networks.find(n=>n.groupId===groupId);
+}
+function ensureCurrentNetwork(){
+  if(!currentNetworkGroupId && db.groups.length) currentNetworkGroupId=db.groups[0].id;
+  let net=getNetwork();
+  if(!net && currentNetworkGroupId){
+    const g=db.groups.find(x=>x.id===currentNetworkGroupId);
+    if(g){
+      net={
+        groupId:g.id,
+        leaderId:g.leader,
+        links:g.members.filter(id=>id!==g.leader).map(id=>({parent:g.leader,child:id,role:'Integrante'}))
+      };
+      db.networks.push(net);
+      saveDB();
+    }
+  }
+  return net;
+}
+function ensureAllNetworks(){
+  let changed=false;
+  db.groups.forEach(g=>{
+    if(!db.networks.some(n=>n.groupId===g.id)){
+      db.networks.push({
+        groupId:g.id,
+        leaderId:g.leader,
+        links:g.members.filter(id=>id!==g.leader).map(id=>({parent:g.leader,child:id,role:'Integrante'}))
+      });
+      changed=true;
+    }
+  });
+  if(changed)saveDB();
+}
+function switchNetwork(groupId){
+  currentNetworkGroupId=groupId||null;selectedNode=null;renderNetworkControls();renderTree();
+}
+function renderNetworkControls(){
+  const sel=document.getElementById('networkSelector'); if(!sel)return;
+  sel.innerHTML=db.groups.length?db.groups.map(g=>`<option value="${g.id}" ${g.id===currentNetworkGroupId?'selected':''}>${esc(g.name)}</option>`).join(''):'<option value="">No hay redes creadas</option>';
+}
+
+function renderTree(){
+  renderNetworkControls();
+  const net=ensureCurrentNetwork();
+  if(!net){tree.innerHTML='<div class="empty">Crea un grupo para generar su red.</div>';return}
+  const root=db.people.find(p=>p.id===net.leaderId);
+  if(!root){tree.innerHTML='<div class="empty">Esta red no tiene un líder válido.</div>';return}
+  tree.innerHTML=nodeHTML(root.id,true);
+}
+function nodeHTML(id,isRoot=false){
+  const p=db.people.find(x=>x.id===id);if(!p)return'';
+  const net=ensureCurrentNetwork();if(!net)return'';
+  const links=net.links.filter(l=>l.parent===id);
+  const role=isRoot?'Principal líder':(linksRole(id)||'Integrante');
+  const photo=p.profile?`<img class="nodePhoto" src="${p.profile}" alt="">`:`<div class="nodePlaceholder">👤</div>`;
+  return `<div class="nodeWrap"><button class="node" onclick="selectNode('${id}')">${photo}<b>${esc(p.name)}</b><span>${esc(role)}</span></button>${links.length?`<div class="children">${links.map(l=>`<div class="child">${nodeHTML(l.child)}</div>`).join('')}</div>`:''}</div>`;
+}
+
+function linksRole(id){const net=ensureCurrentNetwork();return net?.links.find(l=>l.child===id)?.role}
+function selectNode(id){const net=ensureCurrentNetwork();selectedNode=id;const p=db.people.find(x=>x.id===id);selectedInfo.innerHTML=`<b>Seleccionado:</b> ${esc(p?.name||'')}<br><small>Cargo: ${esc(id===net?.leaderId?'Principal líder':(linksRole(id)||'Integrante'))}</small>`;renderTree()}
+function addNode(){if(!selectedNode){toast('Selecciona primero una persona');return}const net=ensureCurrentNetwork();if(!net){toast('No hay una red seleccionada');return}const available=db.people.filter(p=>p.id!==selectedNode&&!net.links.some(l=>l.child===p.id));if(!available.length){toast('No hay personas disponibles');return}openModal('Agregar persona debajo',`<div class="field"><label>Persona</label><select id="addPerson">${available.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`)}</select></div><div class="field"><label>Cargo</label><input id="addRole" value="Integrante"></div><button class="primary" onclick="confirmAdd()">Agregar a la red</button>`)}
+function confirmAdd(){const net=ensureCurrentNetwork();const id=addPerson.value;if(!net)return;if(net.links.some(l=>l.child===id)){toast('Esa persona ya está en la red');return}net.links.push({parent:selectedNode,child:id,role:addRole.value.trim()||'Integrante'});const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g&&!g.members.includes(id))g.members.push(id);saveDB();closeModal();renderAll();toast('Persona agregada')}
+function editRole(){const net=ensureCurrentNetwork();if(!selectedNode){toast('Selecciona una persona');return}if(selectedNode===net?.leaderId){toast('El líder principal no necesita cargo');return}const l=net?.links.find(x=>x.child===selectedNode);openModal('Editar cargo',`<div class="field"><label>Cargo / función</label><input id="editRoleInput" value="${esc(l?.role||'Integrante')}"></div><button class="primary" onclick="confirmRole()">Guardar cargo</button>`)}
+function confirmRole(){const net=ensureCurrentNetwork();const l=net?.links.find(x=>x.child===selectedNode);if(l)l.role=editRoleInput.value.trim()||'Integrante';saveDB();closeModal();renderTree();toast('Cargo actualizado')}
+function chooseLeader(){if(!db.people.length){toast('Primero registra personas');return}openModal('Elegir principal líder',`<div class="field"><label>Principal líder</label><select id="newLeader">${db.people.map(p=>`<option value="${p.id}" ${p.id===db.network.leaderId?'selected':''}>${esc(p.name)}</option>`)}</select></div><button class="primary" onclick="confirmLeader()">Guardar líder</button>`)}
+function confirmLeader(){const id=newLeader.value;db.network.leaderId=id;db.network.links=db.network.links.filter(l=>l.child!==id&&l.parent!==id);saveDB();closeModal();renderTree();toast('Líder actualizado')}
+function showPerson(id){
+  const p=db.people.find(x=>x.id===id);
+  if(!p)return;
+  const vehicles=db.vehicles.filter(v=>v.owner===id);
+  const groups=db.groups.filter(g=>Array.isArray(g.members)&&g.members.includes(id));
+  const personPhotos=Array.isArray(p.photos)?p.photos:[];
+  const housePhotos=Array.isArray(p.housePhotos)?p.housePhotos:[];
+
+  const gallery=(title,icon,photos,empty)=>{
+    const items=photos.map((src,i)=>`
+      <button class="detail-photo" type="button" data-src="${src}" onclick="openPhotoViewer(this.dataset.src)">
+        <img src="${src}" alt="${esc(title)} ${i+1}">
+      </button>`).join('');
+    return `<section class="detail-section">
+      <h3><span>${icon}</span>${title}</h3>
+      ${items?`<div class="detail-gallery">${items}</div>`:`<div class="detail-empty">${empty}</div>`}
+    </section>`;
+  };
+
+  const vehicleHtml=vehicles.length?vehicles.map(v=>{
+    const photos=Array.isArray(v.photos)?v.photos:[];
+    const first=photos[0];
+    const title=[v.make,v.model].filter(Boolean).join(' ')||'Vehículo asociado';
+    return `<div class="detail-vehicle">
+      ${first?`<button class="detail-vehicle-photo" type="button" data-src="${first}" onclick="openPhotoViewer(this.dataset.src)"><img src="${first}" alt="Foto del vehículo"></button>`:`<div class="detail-vehicle-photo vehicle-placeholder">🚗</div>`}
+      <div class="detail-vehicle-info">
+        <strong>${esc(title)}</strong>
+        <span>Placa: ${esc(v.plate||'Sin placa')}</span>
+        <span>Año: ${esc(v.year||'—')}</span>
+        ${v.notes?`<span>${esc(v.notes)}</span>`:''}
+      </div>
+      <button class="detail-arrow" type="button" onclick="showVehicle('${v.id}')">›</button>
+    </div>
+    ${photos.length>1?`<div class="detail-vehicle-thumbs">${photos.slice(1).map(src=>`<button type="button" data-src="${src}" onclick="openPhotoViewer(this.dataset.src)"><img src="${src}" alt="Foto adicional del vehículo"></button>`).join('')}</div>`:''}`;
+  }).join(''):`<div class="detail-empty">No hay vehículo asociado a esta persona.</div>`;
+
+  const groupHtml=groups.length?groups.map(g=>{
+    const net=db.networks.find(n=>n.groupId===g.id);
+    const link=net?.links?.find(l=>l.child===id);
+    const role=id===g.leader?'Principal líder':(link?.role||'Integrante');
+    return `<div class="detail-group-row"><span>👥</span><div><strong>${esc(g.name)}</strong><small>${esc(role)}</small></div><button type="button" onclick="viewNetwork('${g.id}');closeModal()">Red ›</button></div>`;
+  }).join(''):`<div class="detail-empty">No pertenece a ningún grupo.</div>`;
+
+  openModal('Ficha de persona',`
+    <div class="detail-hero">
+      <div class="detail-profile-photo">
+        ${p.profile?`<button type="button" data-src="${p.profile}" onclick="openPhotoViewer(this.dataset.src)"><img src="${p.profile}" alt="Foto de ${esc(p.name)}"></button>`:`<div>👤</div>`}
+      </div>
+      <div class="detail-profile-info">
+        <h2>${esc(p.name)}</h2>
+        <p><b>Cédula:</b> ${esc(p.cedula||'Sin cédula')}</p>
+        <p class="detail-address"><span>📍</span><span><b>Dirección exacta</b><br>${esc(p.location||'No registrada')}</span></p>
+      </div>
+    </div>
+
+    <div class="detail-actions">
+      <button type="button" onclick="closeModal()">✏️ Editar</button>
+      <button type="button" class="danger" onclick="deletePerson('${id}')">🗑️ Eliminar</button>
+    </div>
+
+    ${gallery('Fotos de la persona','👤',personPhotos,'No hay fotos adicionales de la persona.')}
+    ${gallery('Fotos de la casa / ubicación','🏠',housePhotos,'No hay fotos de la casa o ubicación.')}
+
+    <section class="detail-section">
+      <h3><span>🚗</span>Vehículo asociado</h3>
+      ${vehicleHtml}
+    </section>
+
+    <section class="detail-section">
+      <h3><span>👥</span>Grupos y cargo</h3>
+      <div class="detail-groups">${groupHtml}</div>
+    </section>
+
+    <section class="detail-section">
+      <h3><span>📝</span>Notas</h3>
+      <div class="detail-notes">${esc(p.notes||'Sin notas')}</div>
+    </section>
+  `);
+}
+
+function openPhotoViewer(src){
+  if(!src)return;
+  openModal('Fotografía',`<div class="photo-viewer"><img src="${src}" alt="Fotografía ampliada"></div>`);
+}
+
+function deletePerson(id){if(!confirm('¿Eliminar esta persona?'))return;db.people=db.people.filter(p=>p.id!==id);db.vehicles=db.vehicles.filter(v=>v.owner!==id);db.groups.forEach(g=>g.members=g.members.filter(x=>x!==id));db.networks.forEach(n=>{n.links=n.links.filter(l=>l.parent!==id&&l.child!==id);if(n.leaderId===id)n.leaderId=null});saveDB();closeModal();renderAll();toast('Persona eliminada')}
+function deleteVehicle(id){if(!confirm('¿Eliminar vehículo?'))return;db.vehicles=db.vehicles.filter(v=>v.id!==id);saveDB();renderAll();toast('Vehículo eliminado')}
+function normalizeSearch(value){
+  return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+}
+let searchFilter='all';
+
+function setSearchFilter(filter){
+  searchFilter=filter;
+  runGlobalSearch(false);
+}
+
+function runGlobalSearch(scroll=true){
+  const input=document.getElementById('globalSearch');
+  const box=document.getElementById('searchResults');
+  if(!input||!box)return;
+  const raw=input.value||'';
+  const q=normalizeSearch(raw);
+
+  if(!q){
+    box.innerHTML='';
+    return;
+  }
+
+  const people=db.people.filter(p=>{
+    const groups=db.groups.filter(g=>g.members.includes(p.id)).map(g=>g.name).join(' ');
+    const vehicles=db.vehicles.filter(v=>v.owner===p.id).map(v=>[v.make,v.model,v.plate,v.year,v.notes].join(' ')).join(' ');
+    return normalizeSearch([p.name,p.cedula,p.location,p.notes,groups,vehicles].join(' ')).includes(q);
+  });
+
+  const directVehicles=db.vehicles.filter(v=>{
+    const owner=db.people.find(p=>p.id===v.owner);
+    return normalizeSearch([v.make,v.model,v.year,v.plate,v.notes,owner?.name,owner?.location].join(' ')).includes(q);
+  });
+
+  const groups=db.groups.filter(g=>{
+    const leader=db.people.find(p=>p.id===g.leader);
+    const members=g.members.map(id=>db.people.find(x=>x.id===id)?.name||'').join(' ');
+    return normalizeSearch([g.name,leader?.name,members].join(' ')).includes(q);
+  });
+
+  let html=`<div class="panel" style="padding:12px">
+    <div style="font-weight:800;font-size:17px;margin-bottom:7px">Resultados para “${esc(raw)}”</div>
+    <div class="searchFilters">
+      <button class="searchFilter ${searchFilter==='all'?'active':''}" onclick="setSearchFilter('all')">Todos (${people.length+directVehicles.length+groups.length})</button>
+      <button class="searchFilter ${searchFilter==='people'?'active':''}" onclick="setSearchFilter('people')">Personas (${people.length})</button>
+      <button class="searchFilter ${searchFilter==='vehicles'?'active':''}" onclick="setSearchFilter('vehicles')">Vehículos (${directVehicles.length})</button>
+      <button class="searchFilter ${searchFilter==='groups'?'active':''}" onclick="setSearchFilter('groups')">Grupos (${groups.length})</button>
+    </div>`;
+
+  if((searchFilter==='all'||searchFilter==='people') && people.length){
+    html+=`<div class="searchSection">
+      <div class="searchSectionTitle">👤 PERSONAS (${people.length})</div>`;
+    people.forEach(p=>{
+      html+=`<div class="searchPerson">
+        ${p.profile?`<img class="avatarSmall" src="${p.profile}">`:`<div class="avatarSmall">👤</div>`}
+        <main style="flex:1;min-width:0">
+          <strong style="font-size:17px">${esc(p.name)}</strong>
+          <small style="display:block;color:#aeb8c9;margin-top:3px">${p.cedula?`Cédula: ${esc(p.cedula)}`:''}${p.location?` · ${esc(p.location)}`:''}</small>
+        </main>
+        <button class="searchAction" onclick="showPerson('${p.id}')">Ver</button>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  if(searchFilter==='all'||searchFilter==='people'){
+    const peopleVehicles=people.flatMap(p=>db.vehicles.filter(v=>v.owner===p.id));
+    if(peopleVehicles.length){
+      html+=`<div class="searchSection">
+        <div class="searchSectionTitle">🚗 VEHÍCULOS (${peopleVehicles.length})</div>`;
+      peopleVehicles.forEach(v=>{
+        const owner=db.people.find(p=>p.id===v.owner);
+        html+=`<div class="searchVehicle">
+          ${v.photos?.[0]?`<img src="${v.photos[0]}">`:`<div class="vehicleIcon">🚗</div>`}
+          <main style="flex:1;min-width:0">
+            <strong>${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</strong>
+            <small style="display:block;color:#aeb8c9;margin-top:3px">Placa: ${esc(v.plate||'Sin placa')} · Año: ${esc(v.year||'—')}</small>
+            <small style="display:block;color:#8fb4ff;margin-top:2px">Propietario: ${esc(owner?.name||'Sin propietario')}</small>
+          </main>
+          <button class="searchAction" onclick="showVehicle('${v.id}')">👁️ Ver</button>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+  }
+
+  if((searchFilter==='all'||searchFilter==='vehicles') && directVehicles.length){
+    // In "all" we already showed the vehicles related to the matching person.
+    // Only show direct vehicle matches when they weren't already represented.
+    if(searchFilter==='vehicles'){
+      html+=`<div class="searchSection"><div class="searchSectionTitle">🚗 VEHÍCULOS (${directVehicles.length})</div>`;
+      directVehicles.forEach(v=>{
+        const owner=db.people.find(p=>p.id===v.owner);
+        html+=`<div class="searchVehicle">
+          ${v.photos?.[0]?`<img src="${v.photos[0]}">`:`<div class="vehicleIcon">🚗</div>`}
+          <main style="flex:1;min-width:0"><strong>${esc([v.make,v.model].filter(Boolean).join(' ')||'Vehículo')}</strong>
+          <small style="display:block;color:#aeb8c9">Placa: ${esc(v.plate||'Sin placa')} · De: ${esc(owner?.name||'Sin propietario')}</small></main>
+          <button class="searchAction" onclick="showVehicle('${v.id}')">👁️ Ver</button>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+  }
+
+  const matchingGroupsForPeople=people.flatMap(p=>db.groups.filter(g=>g.members.includes(p.id))).filter((g,i,a)=>a.findIndex(x=>x.id===g.id)===i);
+  const shownGroups=searchFilter==='groups'?groups:matchingGroupsForPeople;
+
+  if((searchFilter==='all'||searchFilter==='people'||searchFilter==='groups') && shownGroups.length){
+    html+=`<div class="searchSection">
+      <div class="searchSectionTitle">👥 GRUPOS (${shownGroups.length})</div>`;
+    shownGroups.forEach(g=>{
+      const leader=db.people.find(p=>p.id===g.leader);
+      const matchingPerson=people.find(p=>g.members.includes(p.id));
+      const member=matchingPerson||leader;
+      const net=db.networks.find(n=>n.groupId===g.id);
+      const link=member?net?.links.find(l=>l.child===member.id):null;
+      const role=member?.id===g.leader?'Principal líder':(link?.role||'Integrante');
+      html+=`<div class="searchGroup">
+        <div class="searchGroupIcon">👥</div>
+        <main style="flex:1;min-width:0">
+          <strong>${esc(g.name)}</strong>
+          <small style="display:block;color:#aeb8c9;margin-top:3px">Cargo: ${esc(role)} · ${g.members.length} personas</small>
+          ${member?`<small style="display:block;color:#8fb4ff;margin-top:2px">Persona: ${esc(member.name)}</small>`:''}
+        </main>
+        <button class="searchAction purple" onclick="viewNetwork('${g.id}')">☠️ Red</button>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  const hasResults=people.length||directVehicles.length||groups.length||matchingGroupsForPeople.length;
+  if(!hasResults){
+    html+=`<div class="empty">No hay resultados relacionados con “${esc(raw)}”.</div>`;
+  }
+  html+=`</div>`;
+  box.innerHTML=html;
+  if(scroll)box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const input=document.getElementById('globalSearch');
+  const clear=document.getElementById('searchClear');
+  const box=document.getElementById('searchBox');
+  if(input){
+    input.addEventListener('input',()=>{
+      box?.classList.toggle('hasValue',!!input.value.trim());
+      runGlobalSearch();
+    });
+    input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();runGlobalSearch();input.blur();}});
+  }
+  if(clear)clear.addEventListener('click',()=>{
+    input.value='';
+    box?.classList.remove('hasValue');
+    document.getElementById('searchResults').innerHTML='';
+    input.focus();
+  });
+});
+function openModal(title,body){modalTitle.textContent=title;modalBody.innerHTML=body;modal.classList.add('show')}
+function closeModal(){modal.classList.remove('show')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderAll(){ensureAllNetworks();if(!currentNetworkGroupId&&db.groups.length)currentNetworkGroupId=db.groups[0].id;renderPeople();renderVehicles();renderGroups();renderTree()}
+async function bootApp(){
+  try{
+    const stored=await idbGet();
+    if(stored && typeof stored==='object'){
+      db=stored;
+      if(!Array.isArray(db.people))db.people=[];
+      if(!Array.isArray(db.vehicles))db.vehicles=[];
+      if(!Array.isArray(db.groups))db.groups=[];
+      if(!Array.isArray(db.networks))db.networks=[];
+    }else{
+      // Primera ejecución: migra la copia existente de localStorage a IndexedDB.
+      await idbPut(db);
+    }
+  }catch(e){
+    console.warn('IndexedDB no disponible; se continuará con localStorage:',e);
+  }
+  renderAll();
+}
+bootApp();
+</script>
+</body>
+</html>
