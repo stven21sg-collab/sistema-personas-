@@ -1342,17 +1342,17 @@ function deleteGroup(groupId){const g=db.groups.find(x=>x.id===groupId);if(!g)re
 function viewNetwork(groupId){currentNetworkGroupId=groupId;selectedNode=null;openView('network')}
 function editGroup(groupId){
   const g=db.groups.find(x=>x.id===groupId); if(!g)return;
-  const leader=db.people.find(p=>p.id===g.leader);
+  const memberIds=[...new Set([...(Array.isArray(g.members)?g.members:[]),g.leader])].filter(id=>db.people.some(p=>p.id===id));
   openModal('Editar grupo',`
     <div class="field"><label>Nombre del grupo</label><input id="editGroupName" value="${esc(g.name)}"></div>
-    <div class="field"><label>Principal líder</label><input value="${esc(leader?.name||'—')}" disabled></div>
+    <div class="field"><label>Principal líder</label><select id="editGroupLeader">${memberIds.map(id=>{const p=db.people.find(x=>x.id===id);return `<option value="${id}" ${id===g.leader?'selected':''}>${esc(p?.name||'Persona')}</option>`}).join('')}</select><small>Elige cualquier integrante para convertirlo en líder.</small></div>
     <div class="field"><label>Integrantes guardados</label>
       <div class="checklist">${db.people.map(p=>`
         <label class="check">
-          <input type="checkbox" class="editMember" value="${p.id}" ${(Array.isArray(g.members)?g.members:[]).includes(p.id)?'checked':''} ${p.id===g.leader?'disabled':''}>
+          <input type="checkbox" class="editMember" value="${p.id}" ${(memberIds.includes(p.id)?'checked':'')}>
           ${p.profile?`<img src="${p.profile}" style="width:34px;height:34px;border-radius:50%;object-fit:cover">`:'👤'}
           <span>${esc(p.name)}</span>
-          ${p.id===g.leader?'<small style="margin-left:auto;color:#8fb4ff">LÍDER</small>':''}
+          ${p.id===g.leader?'<small style="margin-left:auto;color:#8fb4ff">LÍDER ACTUAL</small>':''}
         </label>`).join('')}
       </div>
     </div>
@@ -1361,20 +1361,22 @@ function editGroup(groupId){
 }
 function saveGroupEdit(groupId){
   const g=db.groups.find(x=>x.id===groupId); if(!g)return;
-  const name=editGroupName.value.trim(); if(!name){toast('Escribe un nombre para el grupo');return}
+  const name=document.getElementById('editGroupName')?.value.trim(); if(!name){toast('Escribe un nombre para el grupo');return}
+  const oldLeader=g.leader;
+  const newLeader=document.getElementById('editGroupLeader')?.value||oldLeader;
   const selected=[...document.querySelectorAll('.editMember:checked')].map(x=>x.value);
-  if(!selected.includes(g.leader))selected.push(g.leader);
+  if(!selected.includes(newLeader))selected.push(newLeader);
   const oldMembers=Array.isArray(g.members)?[...g.members]:[];
-  g.name=name; g.members=selected;
-  let net=getNetwork(groupId);
-  if(!net && !g.networkDeleted){net={groupId,leaderId:g.leader,links:[]};db.networks.push(net)}
+  const net=getNetwork(groupId);
+  const oldRoles=new Map((net?.links||[]).map(l=>[l.child,l.role]));
+  g.name=name; g.leader=newLeader; g.members=selected;
   if(net){
-    oldMembers.filter(id=>!selected.includes(id)&&id!==g.leader).forEach(id=>detachNetworkMember(net,id));
-    selected.filter(id=>id!==g.leader).forEach(id=>{
-      if(!net.links.some(l=>l.child===id) && id!==net.leaderId) net.links.push({parent:net.leaderId,child:id,role:'Integrante'});
-    });
+    net.name=name; net.leaderId=newLeader; net.leaderRole='Principal líder';
+    net.links=selected.filter(id=>id!==newLeader).map(id=>({parent:newLeader,child:id,role:oldRoles.get(id)||(id===oldLeader?'Líder':'Integrante')}));
+  }else if(!g.networkDeleted){
+    db.networks.push({groupId,name,leaderId:newLeader,leaderRole:'Principal líder',links:selected.filter(id=>id!==newLeader).map(id=>({parent:newLeader,child:id,role:id===oldLeader?'Líder':'Integrante'}))});
   }
-  currentNetworkGroupId=groupId;selectedNode=null;saveDB();closeModal();renderAll();toast('Grupo actualizado');
+  currentNetworkGroupId=groupId;selectedNode=null;saveDB();closeModal();renderAll();toast('Grupo y líder actualizados');
 }
 function getNetwork(groupId=currentNetworkGroupId){
   return db.networks.find(n=>n.groupId===groupId);
