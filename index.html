@@ -1501,7 +1501,33 @@ function removeNetworkMember(id){const net=ensureCurrentNetwork();if(!net||id===
 function addNode(){if(!selectedNode){toast('Selecciona primero una persona');return}const net=ensureCurrentNetwork();if(!net){toast('No hay una red seleccionada');return}const available=db.people.filter(p=>p.id!==selectedNode&&!getNetworkMemberIds(net).includes(p.id));if(!available.length){toast('No hay personas disponibles');return}const roles=['Líder','Logística','Sicario','Colaborador','Consumidor','Seguridad'];openModal('Agregar persona debajo',`<div class="field"><label>Persona</label><select id="addPerson">${available.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div><div class="field"><label>Rol</label><select id="addRole">${roles.map(role=>`<option value="${role}" ${role==='Colaborador'?'selected':''}>${role}</option>`).join('')}</select></div><button class="primary" onclick="confirmAdd()">Agregar a la red</button>`)}
 function confirmAdd(){const net=ensureCurrentNetwork();const id=document.getElementById('addPerson')?.value;if(!net||!id)return;if(getNetworkMemberIds(net).includes(id)){toast('Esa persona ya está en la red');return}net.links.push({parent:selectedNode,child:id,role:document.getElementById('addRole')?.value.trim()||'Integrante'});const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g&&!g.members.includes(id))g.members.push(id);saveDB();closeModal();renderAll();toast('Persona agregada')}
 function chooseLeader(){const net=ensureCurrentNetwork();if(!net){toast('Crea una red primero');return}const ids=getNetworkMemberIds(net);openModal('Elegir principal líder',`<div class="field"><label>Principal líder</label><select id="newLeader">${ids.map(id=>{const p=db.people.find(x=>x.id===id);return `<option value="${id}" ${id===net.leaderId?'selected':''}>${esc(p?.name||'')}</option>`}).join('')}</select></div><button class="primary" onclick="confirmLeader()">Guardar líder</button>`)}
-function confirmLeader(){const net=ensureCurrentNetwork();const id=document.getElementById('newLeader')?.value;if(!net||!id)return;if(id===net.leaderId){closeModal();return}const oldLeader=net.leaderId;net.leaderId=id;net.links=net.links.filter(l=>l.child!==id);const oldLink=net.links.find(l=>l.child===oldLeader);if(oldLink)oldLink.parent=id;else if(oldLeader!==id)net.links.push({parent:id,child:oldLeader,role:'Integrante'});saveDB();closeModal();selectedNode=id;renderTree();toast('Líder actualizado')}
+function confirmLeader(){
+  const net=ensureCurrentNetwork();
+  const id=document.getElementById('newLeader')?.value;
+  if(!net||!id)return;
+  if(id===net.leaderId){closeModal();return;}
+  const group=db.groups.find(g=>g.id===currentNetworkGroupId);
+  const oldLeader=net.leaderId;
+  const newLeaderLink=net.links.find(l=>l.child===id);
+  const newLeaderParent=newLeaderLink?.parent||oldLeader;
+  // El nuevo líder pasa a ser raíz. Sus antiguos subordinados se reorganizan sin perderse.
+  const childrenOfNewLeader=net.links.filter(l=>l.parent===id&&l.child!==oldLeader).map(l=>l.child);
+  net.links=net.links.filter(l=>l.child!==id&&l.parent!==id);
+  net.leaderId=id;
+  if(oldLeader!==id){
+    net.links.push({parent:id,child:oldLeader,role:'Líder'});
+  }
+  childrenOfNewLeader.forEach(child=>{
+    if(!net.links.some(l=>l.child===child))net.links.push({parent:oldLeader,child,role:'Integrante'});
+  });
+  if(group){
+    group.leader=id;
+    if(!Array.isArray(group.members))group.members=[];
+    if(!group.members.includes(id))group.members.push(id);
+    if(!group.members.includes(oldLeader))group.members.push(oldLeader);
+  }
+  saveDB();closeModal();selectedNode=id;renderAll();toast('✅ Líder actualizado en la red y en el grupo');
+}
 
 function showPerson(id){
   const p=db.people.find(x=>x.id===id);
