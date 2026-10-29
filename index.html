@@ -1311,7 +1311,7 @@ function showVehicle(id){
   const ownerGroups=owner?db.groups.filter(g=>g.members.includes(owner.id)).map(g=>{
     const net=db.networks.find(n=>n.groupId===g.id);
     const link=net?.links.find(l=>l.child===owner.id);
-    const role=owner.id===g.leader?'Principal líder':(link?.role||'Integrante');
+    const role=owner.id===g.leader?(net?.leaderRole||'Principal líder'):(link?.role||'Integrante');
     return `<p><b>👥 Grupo:</b> ${esc(g.name)}<br><b>🏷️ Cargo:</b> ${esc(role)}</p>`;
   }).join(''):'';
   openModal('Ficha del vehículo',`
@@ -1462,14 +1462,14 @@ function nodeHTML(id,isRoot=false){
   const p=db.people.find(x=>x.id===id);if(!p)return'';
   const net=ensureCurrentNetwork();if(!net)return'';
   const links=net.links.filter(l=>l.parent===id);
-  const role=isRoot?'Principal líder':(linksRole(id)||'Integrante');
+  const role=isRoot?(net.leaderRole||'Principal líder'):(linksRole(id)||'Integrante');
   const photo=p.profile?`<img class="nodePhoto" src="${p.profile}" alt="">`:`<div class="nodePlaceholder">👤</div>`;
   return `<div class="nodeWrap"><button class="node ${selectedNode===id?'node-selected':''}" onclick="selectNode('${id}')">${photo}<b>${esc(p.name)}</b><span>${esc(role)}</span></button>${links.length?`<div class="children">${links.map(l=>`<div class="child">${nodeHTML(l.child)}</div>`).join('')}</div>`:''}</div>`;
 }
 function linksRole(id){const net=ensureCurrentNetwork();return net?.links.find(l=>l.child===id)?.role}
 function getNetworkMemberIds(net){if(!net)return[];const ids=new Set([net.leaderId]);net.links.forEach(l=>{ids.add(l.parent);ids.add(l.child)});return [...ids].filter(id=>db.people.some(p=>p.id===id))}
 function getDescendants(net,id,seen=new Set()){if(!net||seen.has(id))return seen;seen.add(id);net.links.filter(l=>l.parent===id).forEach(l=>getDescendants(net,l.child,seen));return seen}
-function selectNode(id){const net=ensureCurrentNetwork();selectedNode=id;const p=db.people.find(x=>x.id===id);selectedInfo.innerHTML=`<b>Seleccionado:</b> ${esc(p?.name||'')}<br><small>Cargo: ${esc(id===net?.leaderId?'Principal líder':(linksRole(id)||'Integrante'))}</small>`;renderTree()}
+function selectNode(id){const net=ensureCurrentNetwork();selectedNode=id;const p=db.people.find(x=>x.id===id);selectedInfo.innerHTML=`<b>Seleccionado:</b> ${esc(p?.name||'')}<br><small>Cargo: ${esc(id===net?.leaderId?(net?.leaderRole||'Principal líder'):(linksRole(id)||'Integrante'))}</small>`;renderTree()}
 function renderNetworkEditor(){
   const box=document.getElementById('networkEditor');if(!box)return;
   const net=ensureCurrentNetwork();
@@ -1479,22 +1479,26 @@ function renderNetworkEditor(){
   const p=db.people.find(x=>x.id===selectedNode);
   const isLeader=selectedNode===net.leaderId;
   const link=net.links.find(l=>l.child===selectedNode);
+  const roleOptions=['Líder','Logística','Sicario','Colaborador','Consumidor','Seguridad'];
+  const currentRole=isLeader?(net.leaderRole||'Principal líder'):(link?.role||'Integrante');
+  if(!roleOptions.includes(currentRole))roleOptions.push(currentRole);
+  const roleOptionsHtml=roleOptions.map(role=>`<option value="${esc(role)}" ${role===currentRole?'selected':''}>${esc(role)}</option>`).join('');
   const blocked=getDescendants(net,selectedNode);
   const parentOptions=[net.leaderId,...ids.filter(id=>id!==selectedNode&&!blocked.has(id))].filter((id,i,a)=>a.indexOf(id)===i);
   box.innerHTML=`
     <div class="network-editor-title">Selecciona una persona *</div>
     <div class="field"><select id="networkPersonSelect" onchange="changeSelectedNetworkPerson(this.value)">${ids.map(id=>{const q=db.people.find(x=>x.id===id);return `<option value="${id}" ${id===selectedNode?'selected':''}>${q?.profile?'👤 ':''}${esc(q?.name||'')}</option>`}).join('')}</select></div>
-    <div class="field"><label>Puesto en la red *</label><input id="networkRoleInput" value="${esc(isLeader?'Principal líder':(link?.role||'Integrante'))}" ${isLeader?'disabled':''}></div>
+    <div class="field"><label>Rol en la red *</label><select id="networkRoleInput">${isLeader?`<option value="Principal líder" ${(net.leaderRole||'Principal líder')==='Principal líder'?'selected':''}>Principal líder</option>`:roleOptionsHtml}</select></div>
     <div class="field"><label>Conexión superior (quién lo dirige)</label><select id="networkParentSelect" ${isLeader?'disabled':''}>${parentOptions.map(id=>{const q=db.people.find(x=>x.id===id);return `<option value="${id}" ${id===(link?.parent||net.leaderId)?'selected':''}>${id===net.leaderId?'👑 ':''}${esc(q?.name||'')}</option>`}).join('')}</select></div>
-    <div class="network-editor-actions"><button class="primary" onclick="saveSelectedNetworkPerson()" ${isLeader?'disabled':''}>💾 Guardar cambios</button><button class="secondary" onclick="cancelNetworkEdit()">✕ Cancelar</button></div>
+    <div class="network-editor-actions"><button class="primary" onclick="saveSelectedNetworkPerson()">💾 Guardar cambios</button><button class="secondary" onclick="cancelNetworkEdit()">✕ Cancelar</button></div>
     <div class="network-members-title">Integrantes de la red</div>
-    <div class="network-members-list">${ids.map(id=>{const q=db.people.find(x=>x.id===id);const l=net.links.find(x=>x.child===id);const role=id===net.leaderId?'Principal líder':(l?.role||'Integrante');return `<div class="network-member-row ${id===selectedNode?'active':''}"><button class="network-member-main" onclick="selectNode('${id}')"><span class="network-member-avatar">${q?.profile?`<img src="${q.profile}" alt="">`:'👤'}</span><span><b>${esc(q?.name||'')}</b><small>${esc(role)}</small></span></button><button class="icon-edit" onclick="selectNode('${id}')">✏️</button>${id!==net.leaderId?`<button class="icon-delete" onclick="removeNetworkMember('${id}')">🗑️</button>`:''}</div>`}).join('')}</div>`;
+    <div class="network-members-list">${ids.map(id=>{const q=db.people.find(x=>x.id===id);const l=net.links.find(x=>x.child===id);const role=id===net.leaderId?(net.leaderRole||'Principal líder'):(l?.role||'Integrante');return `<div class="network-member-row ${id===selectedNode?'active':''}"><button class="network-member-main" onclick="selectNode('${id}')"><span class="network-member-avatar">${q?.profile?`<img src="${q.profile}" alt="">`:'👤'}</span><span><b>${esc(q?.name||'')}</b><small>${esc(role)}</small></span></button><button class="icon-edit" onclick="selectNode('${id}')">✏️</button>${id!==net.leaderId?`<button class="icon-delete" onclick="removeNetworkMember('${id}')">🗑️</button>`:''}</div>`}).join('')}</div>`;
 }
 function changeSelectedNetworkPerson(id){selectedNode=id;renderTree()}
-function saveSelectedNetworkPerson(){const net=ensureCurrentNetwork();if(!net||!selectedNode)return;const link=net.links.find(x=>x.child===selectedNode);if(!link){toast('El líder se cambia desde Elegir líder');return}const role=document.getElementById('networkRoleInput')?.value.trim()||'Integrante';const parent=document.getElementById('networkParentSelect')?.value;if(!parent||parent===selectedNode){toast('Selecciona una conexión superior válida');return}if(getDescendants(net,selectedNode).has(parent)){toast('No puedes conectar una persona debajo de uno de sus propios descendientes');return}link.role=role;link.parent=parent;saveDB();renderTree();toast('✅ Cambios guardados y red actualizada')}
+function saveSelectedNetworkPerson(){const net=ensureCurrentNetwork();if(!net||!selectedNode)return;const role=document.getElementById('networkRoleInput')?.value.trim()||'Integrante';if(selectedNode===net.leaderId){net.leaderRole=role;saveDB();renderAll();toast('✅ Cargo del líder actualizado');return}const link=net.links.find(x=>x.child===selectedNode);if(!link){toast('No se encontró la conexión de esta persona');return}const parent=document.getElementById('networkParentSelect')?.value;if(!parent||parent===selectedNode){toast('Selecciona una conexión superior válida');return}if(getDescendants(net,selectedNode).has(parent)){toast('No puedes conectar una persona debajo de uno de sus propios descendientes');return}link.role=role;link.parent=parent;saveDB();renderAll();toast('✅ Cargo y conexión actualizados')}
 function cancelNetworkEdit(){selectedNode=null;selectedInfo.innerHTML='Selecciona una persona en la red para editarla.';renderTree()}
 function removeNetworkMember(id){const net=ensureCurrentNetwork();if(!net||id===net.leaderId){toast('Para retirar al líder, elige primero otro líder');return}const p=db.people.find(x=>x.id===id);if(!confirm(`¿Retirar a ${p?.name||'esta persona'} de la red y del grupo? Su expediente y vehículos se conservarán.`))return;detachNetworkMember(net,id);const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g)g.members=(Array.isArray(g.members)?g.members:[]).filter(x=>x!==id);selectedNode=null;saveDB();renderAll();toast('Persona retirada de la red y del grupo; su expediente se conservó')}
-function addNode(){if(!selectedNode){toast('Selecciona primero una persona');return}const net=ensureCurrentNetwork();if(!net){toast('No hay una red seleccionada');return}const available=db.people.filter(p=>p.id!==selectedNode&&!getNetworkMemberIds(net).includes(p.id));if(!available.length){toast('No hay personas disponibles');return}openModal('Agregar persona debajo',`<div class="field"><label>Persona</label><select id="addPerson">${available.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div><div class="field"><label>Cargo</label><input id="addRole" value="Integrante"></div><button class="primary" onclick="confirmAdd()">Agregar a la red</button>`)}
+function addNode(){if(!selectedNode){toast('Selecciona primero una persona');return}const net=ensureCurrentNetwork();if(!net){toast('No hay una red seleccionada');return}const available=db.people.filter(p=>p.id!==selectedNode&&!getNetworkMemberIds(net).includes(p.id));if(!available.length){toast('No hay personas disponibles');return}const roles=['Líder','Logística','Sicario','Colaborador','Consumidor','Seguridad'];openModal('Agregar persona debajo',`<div class="field"><label>Persona</label><select id="addPerson">${available.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div><div class="field"><label>Rol</label><select id="addRole">${roles.map(role=>`<option value="${role}" ${role==='Colaborador'?'selected':''}>${role}</option>`).join('')}</select></div><button class="primary" onclick="confirmAdd()">Agregar a la red</button>`)}
 function confirmAdd(){const net=ensureCurrentNetwork();const id=document.getElementById('addPerson')?.value;if(!net||!id)return;if(getNetworkMemberIds(net).includes(id)){toast('Esa persona ya está en la red');return}net.links.push({parent:selectedNode,child:id,role:document.getElementById('addRole')?.value.trim()||'Integrante'});const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g&&!g.members.includes(id))g.members.push(id);saveDB();closeModal();renderAll();toast('Persona agregada')}
 function chooseLeader(){const net=ensureCurrentNetwork();if(!net){toast('Crea una red primero');return}const ids=getNetworkMemberIds(net);openModal('Elegir principal líder',`<div class="field"><label>Principal líder</label><select id="newLeader">${ids.map(id=>{const p=db.people.find(x=>x.id===id);return `<option value="${id}" ${id===net.leaderId?'selected':''}>${esc(p?.name||'')}</option>`}).join('')}</select></div><button class="primary" onclick="confirmLeader()">Guardar líder</button>`)}
 function confirmLeader(){const net=ensureCurrentNetwork();const id=document.getElementById('newLeader')?.value;if(!net||!id)return;if(id===net.leaderId){closeModal();return}const oldLeader=net.leaderId;net.leaderId=id;net.links=net.links.filter(l=>l.child!==id);const oldLink=net.links.find(l=>l.child===oldLeader);if(oldLink)oldLink.parent=id;else if(oldLeader!==id)net.links.push({parent:id,child:oldLeader,role:'Integrante'});saveDB();closeModal();selectedNode=id;renderTree();toast('Líder actualizado')}
@@ -1751,7 +1755,7 @@ function runGlobalSearch(scroll=true){
       const member=matchingPerson||leader;
       const net=db.networks.find(n=>n.groupId===g.id);
       const link=member?net?.links.find(l=>l.child===member.id):null;
-      const role=member?.id===g.leader?'Principal líder':(link?.role||'Integrante');
+      const role=member?.id===g.leader?(net?.leaderRole||'Principal líder'):(link?.role||'Integrante');
       html+=`<div class="searchGroup">
         <div class="searchGroupIcon">👥</div>
         <main style="flex:1;min-width:0">
