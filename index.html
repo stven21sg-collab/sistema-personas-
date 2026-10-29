@@ -1052,6 +1052,7 @@ body.cloudReady .cloudLogout{display:block}
 <button class="back" onclick="goHome()">← Principal</button><h2 class="title">☠️ Redes</h2><p class="subtitle">Cada grupo tiene su propia red. Puedes cambiar entre ellas sin mezclar sus integrantes.</p>
 <div class="panel">
 <div class="field"><label>Red / grupo que estás viendo</label><select id="networkSelector" onchange="switchNetwork(this.value)"></select></div>
+<div class="tools"><button class="secondary" onclick="editNetworkName()">✏️ Editar nombre de red</button><button class="secondary" onclick="createCurrentNetwork()">＋ Crear red</button><button class="secondary" onclick="deleteCurrentNetwork()">🗑️ Eliminar red</button></div>
 </div>
 <div class="tools"><button class="secondary" onclick="addNode()">＋ Agregar debajo</button><button class="secondary" onclick="chooseLeader()">⭐ Elegir líder</button></div>
 <div id="networkEditor" class="network-editor panel">
@@ -1274,6 +1275,7 @@ function saveGroup(){
   db.groups.push(group);
   db.networks.push({
     groupId:groupId,
+    name:name,
     leaderId:leader,
     links:links
   });
@@ -1335,8 +1337,8 @@ function deleteVehicleFromDetail(id){
   db.vehicles=db.vehicles.filter(v=>v.id!==id);
   saveDB();closeModal();renderAll();toast('Vehículo eliminado');
 }
-function renderGroups(){groupList.innerHTML=db.groups.length?db.groups.map(g=>{let l=db.people.find(p=>p.id===g.leader);const empty=!Array.isArray(g.members)||g.members.length===0||!g.leader;return `<div class="item"><div class="mini">👥</div><main><strong>${esc(g.name)}</strong><small>Líder: ${esc(l?.name||'—')} · ${Array.isArray(g.members)?g.members.length:0} personas</small></main><button onclick="viewNetwork('${g.id}')">☠️ Red</button><button onclick="editGroup('${g.id}')">✏️ Editar</button>${empty?`<button class="danger-outline" onclick="deleteEmptyGroup('${g.id}')">🗑️ Eliminar grupo</button>`:''}</div>`}).join(''):'<div class="empty">No hay grupos creados.</div>'} 
-function deleteEmptyGroup(groupId){const g=db.groups.find(x=>x.id===groupId);if(!g)return;if(Array.isArray(g.members)&&g.members.length>0&&g.leader){toast('⚠️ Solo puedes eliminar un grupo vacío');return}if(!confirm(`¿Eliminar el grupo "${g.name}"?`))return;db.groups=db.groups.filter(x=>x.id!==groupId);db.networks=db.networks.filter(n=>n.groupId!==groupId);if(currentNetworkGroupId===groupId)currentNetworkGroupId=db.groups[0]?.id||null;saveDB();renderAll();toast('🗑️ Grupo eliminado')}
+function renderGroups(){groupList.innerHTML=db.groups.length?db.groups.map(g=>{const l=db.people.find(p=>p.id===g.leader);const count=Array.isArray(g.members)?g.members.length:0;const hasNetwork=db.networks.some(n=>n.groupId===g.id);return `<div class="item"><div class="mini">👥</div><main><strong>${esc(g.name)}</strong><small>Líder: ${esc(l?.name||'—')} · ${count} personas · ${hasNetwork?'Con red':'Sin red'}</small></main><button onclick="viewNetwork('${g.id}')">☠️ Red</button><button onclick="editGroup('${g.id}')">✏️ Editar</button><button class="danger-outline" onclick="deleteGroup('${g.id}')">🗑️ Eliminar grupo</button></div>`}).join(''):'<div class="empty">No hay grupos creados.</div>'}
+function deleteGroup(groupId){const g=db.groups.find(x=>x.id===groupId);if(!g)return;if(!confirm(`¿Eliminar el grupo "${g.name}" y su red asociada? Las personas y sus expedientes se conservarán.`))return;db.groups=db.groups.filter(x=>x.id!==groupId);db.networks=db.networks.filter(n=>n.groupId!==groupId);if(currentNetworkGroupId===groupId)currentNetworkGroupId=db.groups[0]?.id||null;selectedNode=null;saveDB();renderAll();toast('🗑️ Grupo y red asociada eliminados; las personas se conservaron')}
 function viewNetwork(groupId){currentNetworkGroupId=groupId;selectedNode=null;openView('network')}
 function editGroup(groupId){
   const g=db.groups.find(x=>x.id===groupId); if(!g)return;
@@ -1347,7 +1349,7 @@ function editGroup(groupId){
     <div class="field"><label>Integrantes guardados</label>
       <div class="checklist">${db.people.map(p=>`
         <label class="check">
-          <input type="checkbox" class="editMember" value="${p.id}" ${g.members.includes(p.id)?'checked':''} ${p.id===g.leader?'disabled':''}>
+          <input type="checkbox" class="editMember" value="${p.id}" ${(Array.isArray(g.members)?g.members:[]).includes(p.id)?'checked':''} ${p.id===g.leader?'disabled':''}>
           ${p.profile?`<img src="${p.profile}" style="width:34px;height:34px;border-radius:50%;object-fit:cover">`:'👤'}
           <span>${esc(p.name)}</span>
           ${p.id===g.leader?'<small style="margin-left:auto;color:#8fb4ff">LÍDER</small>':''}
@@ -1362,17 +1364,16 @@ function saveGroupEdit(groupId){
   const name=editGroupName.value.trim(); if(!name){toast('Escribe un nombre para el grupo');return}
   const selected=[...document.querySelectorAll('.editMember:checked')].map(x=>x.value);
   if(!selected.includes(g.leader))selected.push(g.leader);
-  const oldMembers=[...g.members];
+  const oldMembers=Array.isArray(g.members)?[...g.members]:[];
   g.name=name; g.members=selected;
   let net=getNetwork(groupId);
-  if(!net){net={groupId,leaderId:g.leader,links:[]};db.networks.push(net)}
-  const oldLinks=net.links;
-  selected.filter(id=>id!==g.leader).forEach(id=>{
-    if(!net.links.some(l=>l.child===id)) net.links.push({parent:g.leader,child:id,role:'Integrante'});
-  });
-  oldMembers.filter(id=>!selected.includes(id)&&id!==g.leader).forEach(id=>{
-    net.links=net.links.filter(l=>l.child!==id);
-  });
+  if(!net && !g.networkDeleted){net={groupId,leaderId:g.leader,links:[]};db.networks.push(net)}
+  if(net){
+    oldMembers.filter(id=>!selected.includes(id)&&id!==g.leader).forEach(id=>detachNetworkMember(net,id));
+    selected.filter(id=>id!==g.leader).forEach(id=>{
+      if(!net.links.some(l=>l.child===id) && id!==net.leaderId) net.links.push({parent:net.leaderId,child:id,role:'Integrante'});
+    });
+  }
   currentNetworkGroupId=groupId;selectedNode=null;saveDB();closeModal();renderAll();toast('Grupo actualizado');
 }
 function getNetwork(groupId=currentNetworkGroupId){
@@ -1383,7 +1384,7 @@ function ensureCurrentNetwork(){
   let net=getNetwork();
   if(!net && currentNetworkGroupId){
     const g=db.groups.find(x=>x.id===currentNetworkGroupId);
-    if(g){
+    if(g && !g.networkDeleted){
       net={
         groupId:g.id,
         leaderId:g.leader,
@@ -1398,7 +1399,7 @@ function ensureCurrentNetwork(){
 function ensureAllNetworks(){
   let changed=false;
   db.groups.forEach(g=>{
-    if(!db.networks.some(n=>n.groupId===g.id)){
+    if(!db.networks.some(n=>n.groupId===g.id) && !g.networkDeleted){
       db.networks.push({
         groupId:g.id,
         leaderId:g.leader,
@@ -1414,13 +1415,44 @@ function switchNetwork(groupId){
 }
 function renderNetworkControls(){
   const sel=document.getElementById('networkSelector'); if(!sel)return;
-  sel.innerHTML=db.groups.length?db.groups.map(g=>`<option value="${g.id}" ${g.id===currentNetworkGroupId?'selected':''}>${esc(g.name)}</option>`).join(''):'<option value="">No hay redes creadas</option>';
+  sel.innerHTML=db.groups.length?db.groups.map(g=>{const n=db.networks.find(x=>x.groupId===g.id);return `<option value="${g.id}" ${g.id===currentNetworkGroupId?'selected':''}>${esc(n?.name||g.name)}${n?'':' (sin red)'}</option>`}).join(''):'<option value="">No hay grupos creados</option>';
 }
 
+function createCurrentNetwork(){
+  const g=db.groups.find(x=>x.id===currentNetworkGroupId);
+  if(!g){toast('Selecciona un grupo primero');return}
+  if(getNetwork(g.id)){toast('Este grupo ya tiene una red');return}
+  const members=Array.isArray(g.members)?g.members.filter(id=>db.people.some(p=>p.id===id)):[];
+  let leaderId=g.leader;
+  if(!members.includes(leaderId))leaderId=members[0]||null;
+  if(!leaderId){toast('Agrega una persona al grupo antes de crear la red');return}
+  g.leader=leaderId;g.networkDeleted=false;
+  db.networks.push({groupId:g.id,name:g.name,leaderId,links:members.filter(id=>id!==leaderId).map(id=>({parent:leaderId,child:id,role:'Integrante'}))});
+  selectedNode=null;saveDB();renderAll();toast('Red creada');
+}
+function editNetworkName(){
+  const net=ensureCurrentNetwork();if(!net){toast('No hay una red para editar');return}
+  const g=db.groups.find(x=>x.id===net.groupId);const current=net.name||g?.name||'';
+  openModal('Editar nombre de red',`<div class="field"><label>Nombre de la red</label><input id="editNetworkNameInput" value="${esc(current)}" maxlength="100"></div><button class="primary" onclick="saveNetworkName()">💾 Guardar nombre</button>`);
+}
+function saveNetworkName(){const net=ensureCurrentNetwork();const input=document.getElementById('editNetworkNameInput');const name=input?.value.trim();if(!net)return;if(!name){toast('Escribe un nombre para la red');return}net.name=name;saveDB();closeModal();renderAll();toast('Nombre de red actualizado')}
+function deleteCurrentNetwork(){
+  const net=getNetwork(currentNetworkGroupId);if(!net){toast('No hay una red para eliminar');return}
+  const g=db.groups.find(x=>x.id===net.groupId);const name=net.name||g?.name||'esta red';
+  if(!confirm(`¿Eliminar la red "${name}"? El grupo y las personas se conservarán.`))return;
+  db.networks=db.networks.filter(n=>n.groupId!==net.groupId);if(g)g.networkDeleted=true;selectedNode=null;saveDB();renderAll();toast('Red eliminada; el grupo y las personas se conservaron');
+}
+function detachNetworkMember(net,id){
+  if(!net||id===net.leaderId)return;
+  const parent=net.links.find(l=>l.child===id)?.parent||net.leaderId;
+  const children=net.links.filter(l=>l.parent===id).map(l=>l.child);
+  net.links=net.links.filter(l=>l.child!==id&&l.parent!==id);
+  children.forEach(child=>{if(child!==parent&&!net.links.some(l=>l.child===child))net.links.push({parent,child,role:'Integrante'})});
+}
 function renderTree(){
   renderNetworkControls();
   const net=ensureCurrentNetwork();
-  if(!net){tree.innerHTML='<div class="empty">Crea un grupo para generar su red.</div>';renderNetworkEditor();return}
+  if(!net){tree.innerHTML='<div class="empty">Este grupo no tiene una red activa. Pulsa «Crear red» para generarla.</div>';renderNetworkEditor();return}
   const root=db.people.find(p=>p.id===net.leaderId);
   if(!root){tree.innerHTML='<div class="empty">Esta red no tiene un líder válido.</div>';renderNetworkEditor();return}
   tree.innerHTML=nodeHTML(root.id,true);
@@ -1461,7 +1493,7 @@ function renderNetworkEditor(){
 function changeSelectedNetworkPerson(id){selectedNode=id;renderTree()}
 function saveSelectedNetworkPerson(){const net=ensureCurrentNetwork();if(!net||!selectedNode)return;const link=net.links.find(x=>x.child===selectedNode);if(!link){toast('El líder se cambia desde Elegir líder');return}const role=document.getElementById('networkRoleInput')?.value.trim()||'Integrante';const parent=document.getElementById('networkParentSelect')?.value;if(!parent||parent===selectedNode){toast('Selecciona una conexión superior válida');return}if(getDescendants(net,selectedNode).has(parent)){toast('No puedes conectar una persona debajo de uno de sus propios descendientes');return}link.role=role;link.parent=parent;saveDB();renderTree();toast('✅ Cambios guardados y red actualizada')}
 function cancelNetworkEdit(){selectedNode=null;selectedInfo.innerHTML='Selecciona una persona en la red para editarla.';renderTree()}
-function removeNetworkMember(id){const net=ensureCurrentNetwork();if(!net||id===net.leaderId)return;if(!confirm('¿Quitar esta persona de la red?'))return;const descendants=net.links.filter(l=>l.parent===id).map(l=>l.child);const parent=net.links.find(l=>l.child===id)?.parent||net.leaderId;net.links=net.links.filter(l=>l.child!==id&&l.parent!==id);descendants.forEach(child=>{if(!net.links.some(l=>l.child===child))net.links.push({parent,child,role:'Integrante'})});const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g)g.members=g.members.filter(x=>x!==id);selectedNode=null;saveDB();renderAll();toast('Persona retirada de la red')}
+function removeNetworkMember(id){const net=ensureCurrentNetwork();if(!net||id===net.leaderId){toast('Para retirar al líder, elige primero otro líder');return}const p=db.people.find(x=>x.id===id);if(!confirm(`¿Retirar a ${p?.name||'esta persona'} de la red y del grupo? Su expediente y vehículos se conservarán.`))return;detachNetworkMember(net,id);const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g)g.members=(Array.isArray(g.members)?g.members:[]).filter(x=>x!==id);selectedNode=null;saveDB();renderAll();toast('Persona retirada de la red y del grupo; su expediente se conservó')}
 function addNode(){if(!selectedNode){toast('Selecciona primero una persona');return}const net=ensureCurrentNetwork();if(!net){toast('No hay una red seleccionada');return}const available=db.people.filter(p=>p.id!==selectedNode&&!getNetworkMemberIds(net).includes(p.id));if(!available.length){toast('No hay personas disponibles');return}openModal('Agregar persona debajo',`<div class="field"><label>Persona</label><select id="addPerson">${available.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div><div class="field"><label>Cargo</label><input id="addRole" value="Integrante"></div><button class="primary" onclick="confirmAdd()">Agregar a la red</button>`)}
 function confirmAdd(){const net=ensureCurrentNetwork();const id=document.getElementById('addPerson')?.value;if(!net||!id)return;if(getNetworkMemberIds(net).includes(id)){toast('Esa persona ya está en la red');return}net.links.push({parent:selectedNode,child:id,role:document.getElementById('addRole')?.value.trim()||'Integrante'});const g=db.groups.find(x=>x.id===currentNetworkGroupId);if(g&&!g.members.includes(id))g.members.push(id);saveDB();closeModal();renderAll();toast('Persona agregada')}
 function chooseLeader(){const net=ensureCurrentNetwork();if(!net){toast('Crea una red primero');return}const ids=getNetworkMemberIds(net);openModal('Elegir principal líder',`<div class="field"><label>Principal líder</label><select id="newLeader">${ids.map(id=>{const p=db.people.find(x=>x.id===id);return `<option value="${id}" ${id===net.leaderId?'selected':''}>${esc(p?.name||'')}</option>`}).join('')}</select></div><button class="primary" onclick="confirmLeader()">Guardar líder</button>`)}
